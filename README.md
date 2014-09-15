@@ -1,7 +1,6 @@
 Group Name: Clockwork Ornithroper
-Patrick Gibbons - CSCI major, from Pleasanton CA, Sigma Chi President
-=======
 
+Patrick Gibbons - CSCI major, from Pleasanton CA, Sigma Chi President
 
 Matthew Riddell - CSCI major, born & raised in Vermont, plays M:tG.
 
