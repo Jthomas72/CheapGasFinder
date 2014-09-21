@@ -5,6 +5,7 @@ import org.apache.http.client.HttpClient;
 import org.apache.http.client.methods.HttpPost;
 import org.apache.http.impl.client.DefaultHttpClient;
 import org.apache.http.util.EntityUtils;
+import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
 import java.io.IOException;
@@ -27,6 +28,10 @@ public class GetJsonAPI  {
 
     public JSONObject parseJSONObject() throws JSONException {
         return new JSONObject(this.result.substring(this.result.indexOf('{'), this.result.lastIndexOf('}') + 1));
+    }
+
+    public JSONArray parseJSONArray() throws JSONException {
+        return new JSONArray(this.result.substring(this.result.indexOf('{'), this.result.lastIndexOf('}') + 1));
     }
 
 }
