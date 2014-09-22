@@ -31,7 +31,7 @@ public class GetJsonAPI  {
     }
 
     public JSONArray parseJSONArray() throws JSONException {
-        return new JSONArray(this.result.substring(this.result.indexOf('{'), this.result.lastIndexOf('}') + 1));
+        return new JSONArray(this.result.substring(this.result.indexOf('['), this.result.lastIndexOf(']') + 1));
     }
 
 }
