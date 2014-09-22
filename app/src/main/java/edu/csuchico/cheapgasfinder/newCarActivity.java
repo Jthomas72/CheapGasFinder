@@ -21,14 +21,16 @@ import java.util.List;
 public class newCarActivity extends Activity implements AdapterView.OnItemSelectedListener {
 
     String GET_YEARS_URL = "http://www.carqueryapi.com/api/0.3/?callback=?&cmd=getYears";
-    String GET_MAKES_URL = "http://www.carqueryapi.com/api/0.3/?callback=?&cmd=getMakes&sold_in_us=1&year=";
+    String GET_MAKES_URL = "http://www.carqueryapi.com/api/0.3/?callback=?&cmd=getMakes&sold_in_us=1";
+    String GET_MODELS_URL = "http://www.carqueryapi.com/api/0.3/?callback=?&cmd=getModels&sold_in_us=1";
 
-    Spinner yearSpinner = null;
+    Spinner yearSpinner, makeSpinner, modelSpinner;
+
     List<String> yearList = null;
-    int selectedYear = 0;
-
-    Spinner makeSpinner = null;
     List<String> makeList = null;
+
+    int lastSelectedYear = 0;
+    String lastSelectedMake = "";
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -39,16 +41,46 @@ public class newCarActivity extends Activity implements AdapterView.OnItemSelect
         StrictMode.setThreadPolicy(policy);
 
         yearSpinner = (Spinner) findViewById(R.id.year_spinner);
-        yearList = new ArrayList<String>();
+        makeSpinner = (Spinner) findViewById(R.id.make_spinner);
 
         try {
             populateYearSpinner();
         } catch (Exception e) {
             e.printStackTrace();
         }
+
+        yearSpinner.setOnItemSelectedListener(this);
+        makeSpinner.setOnItemSelectedListener(this);
+    }
+
+    @Override
+    public void onItemSelected(AdapterView<?> adapterView, View view, int i, long l) {
+
+        int year = Integer.parseInt((String) yearSpinner.getSelectedItem());
+        String make = (String) makeSpinner.getSelectedItem();
+
+
+        switch (adapterView.getId()) {
+            case R.id.year_spinner:
+                try {
+                    populateMakeSpinner(year);
+                    Log.d("year_value", Integer.toString(year));
+                } catch (Exception e) { e.printStackTrace(); }
+                break;
+            case R.id.make_spinner:
+                try {
+                    populateModelSpinner(make, year);
+                    Log.d("make_value", make);
+                } catch (Exception e) { e.printStackTrace(); }
+                break;
+
+        }
+
     }
 
     public void populateYearSpinner() throws IOException, JSONException, URISyntaxException {
+        yearList = new ArrayList<String>();
+
         int min_year;
         int max_year;
 
@@ -66,15 +98,13 @@ public class newCarActivity extends Activity implements AdapterView.OnItemSelect
                 android.R.layout.simple_spinner_item, this.yearList);
         dataAdapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
         this.yearSpinner.setAdapter(dataAdapter);
-        yearSpinner.setOnItemSelectedListener(this);
     }
 
     public void populateMakeSpinner(int year) throws IOException, URISyntaxException, JSONException {
-        makeSpinner = (Spinner) findViewById(R.id.make_spinner);
         makeList = new ArrayList<String>();
 
         GetJsonAPI jsonAPI = new GetJsonAPI();
-        String jsonString =  jsonAPI.getJSONString(GET_MAKES_URL + Integer.toString(year));
+        String jsonString =  jsonAPI.getJSONString(GET_MAKES_URL + "&year=" + Integer.toString(year));
         Log.w("JSON_out", jsonString);
         JSONArray makesArray = jsonAPI.parseJSONObject().getJSONArray("Makes");
 
@@ -87,6 +117,28 @@ public class newCarActivity extends Activity implements AdapterView.OnItemSelect
         dataAdapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
         makeSpinner.setAdapter(dataAdapter);
     }
+
+    public void populateModelSpinner(String make_id, int year) throws IOException, URISyntaxException, JSONException {
+        modelSpinner = (Spinner) findViewById(R.id.model_spinner);
+        List<String> modelList = new ArrayList<String>();
+
+        GetJsonAPI jsonAPI = new GetJsonAPI();
+        String jsonURL = GET_MODELS_URL + "&year=" + Integer.toString(year) + "&make=" + make_id;
+        Log.d("JSON_URL", jsonURL);
+        String jsonString =  jsonAPI.getJSONString(jsonURL);
+        Log.d("JSON_out", jsonString);
+        JSONArray modelsArray = jsonAPI.parseJSONObject().getJSONArray("Models");
+
+        for (int i = 0; i < modelsArray.length(); i++) {
+            modelList.add(modelsArray.getJSONObject(i).getString("model_name"));
+        }
+
+        ArrayAdapter<String> dataAdapter = new ArrayAdapter<String>(this,
+                android.R.layout.simple_spinner_item, modelList);
+        dataAdapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
+        modelSpinner.setAdapter(dataAdapter);
+    }
+
 
     @Override
     public boolean onCreateOptionsMenu(Menu menu) {
@@ -106,15 +158,6 @@ public class newCarActivity extends Activity implements AdapterView.OnItemSelect
             return true;
         }
         return super.onOptionsItemSelected(item);
-    }
-
-    @Override
-    public void onItemSelected(AdapterView<?> adapterView, View view, int i, long l) {
-        try {
-            populateMakeSpinner(Integer.parseInt((String) adapterView.getItemAtPosition(i)));
-        } catch (Exception e) {
-            e.printStackTrace();;
-        }
     }
 
     @Override
