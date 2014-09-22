@@ -4,27 +4,38 @@ import android.app.Activity;
 import android.os.Bundle;
 import android.os.StrictMode;
 import android.util.Log;
+import android.util.Pair;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
 import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
 import android.widget.Spinner;
+import android.widget.TextView;
+
 import org.json.JSONArray;
 import org.json.JSONException;
+import org.json.JSONObject;
+
 import java.io.IOException;
 import java.net.URISyntaxException;
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 
 public class newCarActivity extends Activity implements AdapterView.OnItemSelectedListener {
 
-    String GET_YEARS_URL = "http://www.carqueryapi.com/api/0.3/?callback=?&cmd=getYears";
-    String GET_MAKES_URL = "http://www.carqueryapi.com/api/0.3/?callback=?&cmd=getMakes&sold_in_us=1";
-    String GET_MODELS_URL = "http://www.carqueryapi.com/api/0.3/?callback=?&cmd=getModels&sold_in_us=1";
+    String GET_YEARS_URL      = "http://www.carqueryapi.com/api/0.3/?callback=?&cmd=getYears";
+    String GET_MAKES_URL      = "http://www.carqueryapi.com/api/0.3/?callback=?&cmd=getMakes&sold_in_us=1";
+    String GET_MODELS_URL     = "http://www.carqueryapi.com/api/0.3/?callback=?&cmd=getModels&sold_in_us=1";
+    String GET_TRIMS_URL       = "http://www.carqueryapi.com/api/0.3/?callback=?&cmd=getTrims";
+    String GET_MODEL_DATA_URL = "http://www.carqueryapi.com/api/0.3/?callback=?&cmd=getModel";
 
-    Spinner yearSpinner, makeSpinner, modelSpinner;
+    Spinner yearSpinner, makeSpinner, modelSpinner, trimSpinner;
+
+    Map<String, Integer> trimMap = new HashMap<String, Integer>();
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -34,8 +45,10 @@ public class newCarActivity extends Activity implements AdapterView.OnItemSelect
         StrictMode.ThreadPolicy policy = new StrictMode.ThreadPolicy.Builder().permitAll().build();
         StrictMode.setThreadPolicy(policy);
 
-        yearSpinner = (Spinner) findViewById(R.id.year_spinner);
-        makeSpinner = (Spinner) findViewById(R.id.make_spinner);
+        yearSpinner  = (Spinner) findViewById(R.id.year_spinner);
+        makeSpinner  = (Spinner) findViewById(R.id.make_spinner);
+        modelSpinner = (Spinner) findViewById(R.id.model_spinner);
+        trimSpinner  = (Spinner) findViewById(R.id.trim_spinner);
 
         try {
             populateYearSpinner();
@@ -45,12 +58,16 @@ public class newCarActivity extends Activity implements AdapterView.OnItemSelect
 
         yearSpinner.setOnItemSelectedListener(this);
         makeSpinner.setOnItemSelectedListener(this);
+        modelSpinner.setOnItemSelectedListener(this);
+        trimSpinner.setOnItemSelectedListener(this);
     }
 
     @Override
     public void onItemSelected(AdapterView<?> adapterView, View view, int i, long l) {
-        int year = Integer.parseInt((String) yearSpinner.getSelectedItem());
-        String make = (String) makeSpinner.getSelectedItem();
+        int year     = Integer.parseInt((String) yearSpinner.getSelectedItem());
+        String make  = (String) makeSpinner.getSelectedItem();
+        String model = (String) modelSpinner.getSelectedItem();
+        String trim  = (String) trimSpinner.getSelectedItem();
 
         switch (adapterView.getId()) {
             case R.id.year_spinner:
@@ -65,7 +82,18 @@ public class newCarActivity extends Activity implements AdapterView.OnItemSelect
                     Log.d("make_value", make);
                 } catch (Exception e) { e.printStackTrace(); }
                 break;
-
+            case R.id.model_spinner:
+                try {
+                    populateTrimSpinner(model, make, year);
+                    Log.d("model_value", model);
+                } catch (Exception e) { e.printStackTrace(); }
+                break;
+            case R.id.trim_spinner:
+                try {
+                    int modelID = trimMap.get(trim);
+                    updateCarInfo(modelID);
+                } catch (Exception e) { e.printStackTrace(); }
+                break;
         }
 
     }
@@ -110,12 +138,11 @@ public class newCarActivity extends Activity implements AdapterView.OnItemSelect
         makeSpinner.setAdapter(dataAdapter);
     }
 
-    public void populateModelSpinner(String make_id, int year) throws IOException, URISyntaxException, JSONException {
-        modelSpinner = (Spinner) findViewById(R.id.model_spinner);
+    public void populateModelSpinner(String make, int year) throws IOException, URISyntaxException, JSONException {
         List<String> modelList = new ArrayList<String>();
 
         GetJsonAPI jsonAPI = new GetJsonAPI();
-        String jsonURL = GET_MODELS_URL + "&year=" + Integer.toString(year) + "&make=" + make_id;
+        String jsonURL = GET_MODELS_URL + "&year=" + Integer.toString(year) + "&make=" + make;
         Log.d("JSON_URL", jsonURL);
         String jsonString =  jsonAPI.getJSONString(jsonURL);
         Log.d("JSON_out", jsonString);
@@ -129,6 +156,58 @@ public class newCarActivity extends Activity implements AdapterView.OnItemSelect
                 android.R.layout.simple_spinner_item, modelList);
         dataAdapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
         modelSpinner.setAdapter(dataAdapter);
+    }
+
+    private void populateTrimSpinner(String model, String make, int year) throws IOException, URISyntaxException, JSONException {
+        trimMap = new HashMap<String, Integer>();
+        GetJsonAPI jsonAPI = new GetJsonAPI();
+        String jsonURL = GET_TRIMS_URL + "&year=" + Integer.toString(year) + "&make=" + make + "&model=" + model;
+        Log.d("JSON_URL", jsonURL);
+        String jsonString = jsonAPI.getJSONString(jsonURL);
+        Log.d("JSON_out", jsonString);
+        JSONArray trimsArray = jsonAPI.parseJSONObject().getJSONArray("Trims");
+
+        for (int i = 0; i < trimsArray.length(); i++ ) {
+            String trimName = trimsArray.getJSONObject(i).getString("model_trim");
+            if (trimName.isEmpty()) trimName = "None";
+            int trimID = trimsArray.getJSONObject(i).getInt("model_id");
+            trimMap.put(trimName, trimID);
+        }
+
+        List<String> trimList = new ArrayList<String>(trimMap.keySet());
+        ArrayAdapter<String> dataAdapter = new ArrayAdapter<String>(this,
+                android.R.layout.simple_spinner_item, trimList);
+        dataAdapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
+        trimSpinner.setAdapter(dataAdapter);
+
+
+    }
+
+    public void updateCarInfo(int modelID) throws IOException, URISyntaxException, JSONException {
+        TextView textView = (TextView) findViewById(R.id.car_info);
+        Double mpg, tankSize;
+
+        GetJsonAPI jsonAPI = new GetJsonAPI();
+        String jsonURL = GET_MODEL_DATA_URL + "&model=" + modelID;
+        Log.d("JSON_URL", jsonURL);
+        String jsonString = jsonAPI.getJSONString(jsonURL);
+        Log.d("JSON_out", jsonString);
+
+        JSONObject carInfo = jsonAPI.parseJSONArray().getJSONObject(0);
+        if (!carInfo.isNull("model_mpg_city")) {
+            mpg = carInfo.getDouble("model_mpg_city");
+        } else {
+            mpg =  null;
+        }
+        if (!carInfo.isNull("model_fuel_cap_g")) {
+            tankSize = carInfo.getDouble("model_fuel_cap_g");
+        } else {
+            tankSize =  null;
+        }
+
+
+        textView.setText("MPG: " + ((mpg != null) ? mpg : "Not available") +
+                "\nTank size: " + ((tankSize != null) ? tankSize : "Not available"));
     }
 
 
