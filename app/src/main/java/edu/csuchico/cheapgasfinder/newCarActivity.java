@@ -26,12 +26,6 @@ public class newCarActivity extends Activity implements AdapterView.OnItemSelect
 
     Spinner yearSpinner, makeSpinner, modelSpinner;
 
-    List<String> yearList = null;
-    List<String> makeList = null;
-
-    int lastSelectedYear = 0;
-    String lastSelectedMake = "";
-
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -55,10 +49,8 @@ public class newCarActivity extends Activity implements AdapterView.OnItemSelect
 
     @Override
     public void onItemSelected(AdapterView<?> adapterView, View view, int i, long l) {
-
         int year = Integer.parseInt((String) yearSpinner.getSelectedItem());
         String make = (String) makeSpinner.getSelectedItem();
-
 
         switch (adapterView.getId()) {
             case R.id.year_spinner:
@@ -79,7 +71,7 @@ public class newCarActivity extends Activity implements AdapterView.OnItemSelect
     }
 
     public void populateYearSpinner() throws IOException, JSONException, URISyntaxException {
-        yearList = new ArrayList<String>();
+        List<String> yearList = new ArrayList<String>();
 
         int min_year;
         int max_year;
@@ -90,18 +82,18 @@ public class newCarActivity extends Activity implements AdapterView.OnItemSelect
         min_year = jsonAPI.parseJSONObject().getJSONObject("Years").getInt("min_year");
         max_year = jsonAPI.parseJSONObject().getJSONObject("Years").getInt("max_year");
 
-        for (int i = min_year; i <= max_year; i++) {
-            this.yearList.add(Integer.toString(i));
+        for (int i = max_year; i >= min_year; i--) {
+            yearList.add(Integer.toString(i));
         }
 
         ArrayAdapter<String> dataAdapter = new ArrayAdapter<String>(this,
-                android.R.layout.simple_spinner_item, this.yearList);
+                android.R.layout.simple_spinner_item, yearList);
         dataAdapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
-        this.yearSpinner.setAdapter(dataAdapter);
+        yearSpinner.setAdapter(dataAdapter);
     }
 
     public void populateMakeSpinner(int year) throws IOException, URISyntaxException, JSONException {
-        makeList = new ArrayList<String>();
+        List<String> makeList = new ArrayList<String>();
 
         GetJsonAPI jsonAPI = new GetJsonAPI();
         String jsonString =  jsonAPI.getJSONString(GET_MAKES_URL + "&year=" + Integer.toString(year));
