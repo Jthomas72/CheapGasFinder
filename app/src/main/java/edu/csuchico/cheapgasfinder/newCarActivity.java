@@ -1,10 +1,10 @@
 package edu.csuchico.cheapgasfinder;
 
 import android.app.Activity;
+import android.content.SharedPreferences;
 import android.os.Bundle;
 import android.os.StrictMode;
 import android.util.Log;
-import android.util.Pair;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
@@ -20,9 +20,12 @@ import org.json.JSONObject;
 import java.io.IOException;
 import java.net.URISyntaxException;
 import java.util.ArrayList;
+import java.util.Collection;
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 
 
 public class newCarActivity extends Activity implements AdapterView.OnItemSelectedListener {
@@ -34,9 +37,14 @@ public class newCarActivity extends Activity implements AdapterView.OnItemSelect
     String GET_MODEL_DATA_URL = "http://www.carqueryapi.com/api/0.3/?callback=?&cmd=getModel";
 
     Spinner yearSpinner, makeSpinner, modelSpinner, trimSpinner;
-
+    TextView nameTextView;
     Map<String, Integer> trimMap = new HashMap<String, Integer>();
 
+    int year;
+    String make, model, trim;
+    Double mpg, tankSize;
+
+    String PREFS_NAME = "UserPrefs";
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -45,6 +53,7 @@ public class newCarActivity extends Activity implements AdapterView.OnItemSelect
         StrictMode.ThreadPolicy policy = new StrictMode.ThreadPolicy.Builder().permitAll().build();
         StrictMode.setThreadPolicy(policy);
 
+        nameTextView = (TextView) findViewById(R.id.nickname_text);
         yearSpinner  = (Spinner) findViewById(R.id.year_spinner);
         makeSpinner  = (Spinner) findViewById(R.id.make_spinner);
         modelSpinner = (Spinner) findViewById(R.id.model_spinner);
@@ -64,10 +73,10 @@ public class newCarActivity extends Activity implements AdapterView.OnItemSelect
 
     @Override
     public void onItemSelected(AdapterView<?> adapterView, View view, int i, long l) {
-        int year     = Integer.parseInt((String) yearSpinner.getSelectedItem());
-        String make  = (String) makeSpinner.getSelectedItem();
-        String model = (String) modelSpinner.getSelectedItem();
-        String trim  = (String) trimSpinner.getSelectedItem();
+        year = Integer.parseInt((String) yearSpinner.getSelectedItem());
+        make = (String) makeSpinner.getSelectedItem();
+        model = (String) modelSpinner.getSelectedItem();
+        trim = (String) trimSpinner.getSelectedItem();
 
         switch (adapterView.getId()) {
             case R.id.year_spinner:
@@ -101,14 +110,11 @@ public class newCarActivity extends Activity implements AdapterView.OnItemSelect
     public void populateYearSpinner() throws IOException, JSONException, URISyntaxException {
         List<String> yearList = new ArrayList<String>();
 
-        int min_year;
-        int max_year;
-
         GetJsonAPI jsonAPI = new GetJsonAPI();
         String jsonString = jsonAPI.getJSONString(GET_YEARS_URL);
         Log.w("JSON_out", jsonString);
-        min_year = jsonAPI.parseJSONObject().getJSONObject("Years").getInt("min_year");
-        max_year = jsonAPI.parseJSONObject().getJSONObject("Years").getInt("max_year");
+        int min_year = jsonAPI.parseJSONObject().getJSONObject("Years").getInt("min_year");
+        int max_year = jsonAPI.parseJSONObject().getJSONObject("Years").getInt("max_year");
 
         for (int i = max_year; i >= min_year; i--) {
             yearList.add(Integer.toString(i));
@@ -185,7 +191,6 @@ public class newCarActivity extends Activity implements AdapterView.OnItemSelect
 
     public void updateCarInfo(int modelID) throws IOException, URISyntaxException, JSONException {
         TextView textView = (TextView) findViewById(R.id.car_info);
-        Double mpg, tankSize;
 
         GetJsonAPI jsonAPI = new GetJsonAPI();
         String jsonURL = GET_MODEL_DATA_URL + "&model=" + modelID;
@@ -208,6 +213,25 @@ public class newCarActivity extends Activity implements AdapterView.OnItemSelect
 
         textView.setText("MPG: " + ((mpg != null) ? mpg : "Not available") +
                 "\nTank size: " + ((tankSize != null) ? tankSize : "Not available"));
+    }
+
+    public void saveCar(View view) {
+        String name = nameTextView.getText().toString();
+        Car car = new Car(name, year, make, model, trim, mpg, tankSize);
+        String carJson = car.toJSON();
+        Log.d("JSON_car", carJson);
+
+        SharedPreferences prefs = getSharedPreferences(PREFS_NAME, 0);
+        SharedPreferences.Editor editor = prefs.edit();
+
+        Set<String> cars = prefs.getStringSet("cars", null);
+        if (cars == null) {
+            cars = new HashSet<String>();
+        }
+        cars.add(carJson);
+
+        editor.putStringSet("cars", cars);
+        editor.commit();
     }
 
 

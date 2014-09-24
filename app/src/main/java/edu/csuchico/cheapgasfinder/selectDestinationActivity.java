@@ -1,28 +1,24 @@
 package edu.csuchico.cheapgasfinder;
 
 import android.app.Activity;
-import android.content.Intent;
 import android.os.Bundle;
 import android.view.Menu;
 import android.view.MenuItem;
-import android.view.View;
-
-import java.util.ArrayList;
 
 
-public class selectCarActivity extends Activity {
+public class selectDestinationActivity extends Activity {
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        setContentView(R.layout.activity_select_car);
+        setContentView(R.layout.activity_select_destination);
     }
 
 
     @Override
     public boolean onCreateOptionsMenu(Menu menu) {
         // Inflate the menu; this adds items to the action bar if it is present.
-        getMenuInflater().inflate(R.menu.select_car, menu);
+        getMenuInflater().inflate(R.menu.select_destination, menu);
         return true;
     }
 
@@ -36,15 +32,5 @@ public class selectCarActivity extends Activity {
             return true;
         }
         return super.onOptionsItemSelected(item);
-    }
-
-    public void addCar(View view) {
-        Intent intent = new Intent(selectCarActivity.this, newCarActivity.class);
-        startActivity(intent);
-    }
-
-    public ArrayList<String> getCars () {
-
-        return null;
     }
 }
