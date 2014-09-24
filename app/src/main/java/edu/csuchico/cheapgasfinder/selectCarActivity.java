@@ -2,20 +2,34 @@ package edu.csuchico.cheapgasfinder;
 
 import android.app.Activity;
 import android.content.Intent;
+import android.content.SharedPreferences;
 import android.os.Bundle;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
+import android.widget.ArrayAdapter;
+import android.widget.ListView;
+import android.widget.SimpleCursorAdapter;
 
 import java.util.ArrayList;
+import java.util.List;
+import java.util.Set;
 
 
 public class selectCarActivity extends Activity {
+
+    final static String PREFS_NAME = "UserPrefs";
+    ListView carsListView;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_select_car);
+
+        carsListView = (ListView) findViewById(R.id.car_list);
+        ArrayList<String> carsArray = getCars();
+        ArrayAdapter<String> arrayAdapter = new ArrayAdapter<String>(this, android.R.layout.simple_list_item_1, carsArray);
+        carsListView.setAdapter(arrayAdapter);
     }
 
 
@@ -44,7 +58,8 @@ public class selectCarActivity extends Activity {
     }
 
     public ArrayList<String> getCars () {
-
-        return null;
+        SharedPreferences prefs = getSharedPreferences(PREFS_NAME, 0);
+        Set<String> cars = prefs.getStringSet("cars", null);
+        return new ArrayList<String>(cars);
     }
 }

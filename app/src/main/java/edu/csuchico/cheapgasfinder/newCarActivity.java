@@ -20,7 +20,6 @@ import org.json.JSONObject;
 import java.io.IOException;
 import java.net.URISyntaxException;
 import java.util.ArrayList;
-import java.util.Collection;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
@@ -45,6 +44,7 @@ public class newCarActivity extends Activity implements AdapterView.OnItemSelect
     Double mpg, tankSize;
 
     String PREFS_NAME = "UserPrefs";
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
