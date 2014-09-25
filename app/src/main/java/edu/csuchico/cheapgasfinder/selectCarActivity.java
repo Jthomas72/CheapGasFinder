@@ -9,13 +9,9 @@ import android.view.MenuItem;
 import android.view.View;
 import android.widget.ArrayAdapter;
 import android.widget.ListView;
-import android.widget.SimpleCursorAdapter;
 
 import com.google.gson.Gson;
-import com.google.gson.GsonBuilder;
-
 import java.util.ArrayList;
-import java.util.List;
 import java.util.Set;
 
 
@@ -28,6 +24,11 @@ public class selectCarActivity extends Activity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_select_car);
+    }
+
+    @Override
+    public void onResume() {
+        super.onResume();
 
         carsListView = (ListView) findViewById(R.id.car_list);
         ArrayList<String> carsStrings = getCars();
