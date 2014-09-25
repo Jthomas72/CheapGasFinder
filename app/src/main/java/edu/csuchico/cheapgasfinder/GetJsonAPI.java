@@ -13,25 +13,23 @@ import java.net.URISyntaxException;
 
 
 public class GetJsonAPI  {
-    String result = null;
+    private String content;
 
-    public String getJSONString(String request) throws IOException, URISyntaxException {
+    public String getJSONString(String URL) throws IOException, URISyntaxException {
         HttpClient httpClient = new DefaultHttpClient();
-        HttpPost httpPost = new HttpPost(request);
+        HttpPost httpPost = new HttpPost(URL);
         HttpResponse httpResponse = httpClient.execute(httpPost);
-
         String jsonString = EntityUtils.toString(httpResponse.getEntity());
 
-        result = jsonString;
+        content = jsonString;
         return jsonString;
     }
-
     public JSONObject parseJSONObject() throws JSONException {
-        return new JSONObject(this.result.substring(this.result.indexOf('{'), this.result.lastIndexOf('}') + 1));
+        return new JSONObject(this.content.substring(this.content.indexOf('{'), this.content.lastIndexOf('}') + 1));
     }
 
     public JSONArray parseJSONArray() throws JSONException {
-        return new JSONArray(this.result.substring(this.result.indexOf('['), this.result.lastIndexOf(']') + 1));
+        return new JSONArray(this.content.substring(this.content.indexOf('['), this.content.lastIndexOf(']') + 1));
     }
 
 }
