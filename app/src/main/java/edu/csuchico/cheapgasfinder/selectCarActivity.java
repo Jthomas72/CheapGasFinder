@@ -11,6 +11,9 @@ import android.widget.ArrayAdapter;
 import android.widget.ListView;
 import android.widget.SimpleCursorAdapter;
 
+import com.google.gson.Gson;
+import com.google.gson.GsonBuilder;
+
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Set;
@@ -27,8 +30,14 @@ public class selectCarActivity extends Activity {
         setContentView(R.layout.activity_select_car);
 
         carsListView = (ListView) findViewById(R.id.car_list);
-        ArrayList<String> carsArray = getCars();
-        ArrayAdapter<String> arrayAdapter = new ArrayAdapter<String>(this, android.R.layout.simple_list_item_1, carsArray);
+        ArrayList<String> carsStrings = getCars();
+        ArrayList<String> carList = new ArrayList<String>();
+        for (int i = 0; i < carsStrings.size(); i++) {
+            Gson gson = new Gson();
+            Car car = gson.fromJson(carsStrings.get(i), Car.class);
+            carList.add(car.name);
+        }
+        ArrayAdapter<String> arrayAdapter = new ArrayAdapter<String>(this, android.R.layout.simple_list_item_1, carList);
         carsListView.setAdapter(arrayAdapter);
     }
 
