@@ -32,7 +32,7 @@ public class newCarActivity extends Activity implements AdapterView.OnItemSelect
     String GET_YEARS_URL      = "http://www.carqueryapi.com/api/0.3/?callback=?&cmd=getYears";
     String GET_MAKES_URL      = "http://www.carqueryapi.com/api/0.3/?callback=?&cmd=getMakes&sold_in_us=1";
     String GET_MODELS_URL     = "http://www.carqueryapi.com/api/0.3/?callback=?&cmd=getModels&sold_in_us=1";
-    String GET_TRIMS_URL       = "http://www.carqueryapi.com/api/0.3/?callback=?&cmd=getTrims";
+    String GET_TRIMS_URL      = "http://www.carqueryapi.com/api/0.3/?callback=?&cmd=getTrims";
     String GET_MODEL_DATA_URL = "http://www.carqueryapi.com/api/0.3/?callback=?&cmd=getModel";
 
     Spinner yearSpinner, makeSpinner, modelSpinner, trimSpinner;
@@ -109,10 +109,11 @@ public class newCarActivity extends Activity implements AdapterView.OnItemSelect
 
     public void populateYearSpinner() throws IOException, JSONException, URISyntaxException {
         List<String> yearList = new ArrayList<String>();
+        String jsonURL = GET_YEARS_URL;
+        Log.d("JSON_URL", jsonURL);
+        GetJsonAPI jsonAPI = new GetJsonAPI(jsonURL);
+        Log.w("JSON_out", jsonAPI.getJSONString());
 
-        GetJsonAPI jsonAPI = new GetJsonAPI();
-        String jsonString = jsonAPI.getJSONString(GET_YEARS_URL);
-        Log.w("JSON_out", jsonString);
         int min_year = jsonAPI.parseJSONObject().getJSONObject("Years").getInt("min_year");
         int max_year = jsonAPI.parseJSONObject().getJSONObject("Years").getInt("max_year");
 
@@ -128,9 +129,10 @@ public class newCarActivity extends Activity implements AdapterView.OnItemSelect
 
     public void populateMakeSpinner(int year) throws IOException, URISyntaxException, JSONException {
         List<String> makeList = new ArrayList<String>();
-
-        GetJsonAPI jsonAPI = new GetJsonAPI();
-        String jsonString =  jsonAPI.getJSONString(GET_MAKES_URL + "&year=" + Integer.toString(year));
+        String jsonURL = GET_MAKES_URL + "&year=" + Integer.toString(year);
+        Log.d("JSON_URL", jsonURL);
+        GetJsonAPI jsonAPI = new GetJsonAPI(jsonURL);
+        String jsonString =  jsonAPI.getJSONString();
         Log.w("JSON_out", jsonString);
         JSONArray makesArray = jsonAPI.parseJSONObject().getJSONArray("Makes");
 
@@ -146,12 +148,10 @@ public class newCarActivity extends Activity implements AdapterView.OnItemSelect
 
     public void populateModelSpinner(String make, int year) throws IOException, URISyntaxException, JSONException {
         List<String> modelList = new ArrayList<String>();
-
-        GetJsonAPI jsonAPI = new GetJsonAPI();
         String jsonURL = GET_MODELS_URL + "&year=" + Integer.toString(year) + "&make=" + make;
         Log.d("JSON_URL", jsonURL);
-        String jsonString =  jsonAPI.getJSONString(jsonURL);
-        Log.d("JSON_out", jsonString);
+        GetJsonAPI jsonAPI = new GetJsonAPI(jsonURL);
+        Log.d("JSON_out", jsonAPI.getJSONString());
         JSONArray modelsArray = jsonAPI.parseJSONObject().getJSONArray("Models");
 
         for (int i = 0; i < modelsArray.length(); i++) {
@@ -166,11 +166,10 @@ public class newCarActivity extends Activity implements AdapterView.OnItemSelect
 
     private void populateTrimSpinner(String model, String make, int year) throws IOException, URISyntaxException, JSONException {
         trimMap = new HashMap<String, Integer>();
-        GetJsonAPI jsonAPI = new GetJsonAPI();
         String jsonURL = GET_TRIMS_URL + "&year=" + Integer.toString(year) + "&make=" + make + "&model=" + model;
+        GetJsonAPI jsonAPI = new GetJsonAPI(jsonURL);
         Log.d("JSON_URL", jsonURL);
-        String jsonString = jsonAPI.getJSONString(jsonURL);
-        Log.d("JSON_out", jsonString);
+        Log.d("JSON_out", jsonAPI.getJSONString());
         JSONArray trimsArray = jsonAPI.parseJSONObject().getJSONArray("Trims");
 
         for (int i = 0; i < trimsArray.length(); i++ ) {
@@ -191,12 +190,10 @@ public class newCarActivity extends Activity implements AdapterView.OnItemSelect
 
     public void updateCarInfo(int modelID) throws IOException, URISyntaxException, JSONException {
         TextView textView = (TextView) findViewById(R.id.car_info);
-
-        GetJsonAPI jsonAPI = new GetJsonAPI();
         String jsonURL = GET_MODEL_DATA_URL + "&model=" + modelID;
         Log.d("JSON_URL", jsonURL);
-        String jsonString = jsonAPI.getJSONString(jsonURL);
-        Log.d("JSON_out", jsonString);
+        GetJsonAPI jsonAPI = new GetJsonAPI(jsonURL);
+        Log.d("JSON_out", jsonAPI.getJSONString());
 
         JSONObject carInfo = jsonAPI.parseJSONArray().getJSONObject(0);
         if (!carInfo.isNull("model_mpg_city")) {
