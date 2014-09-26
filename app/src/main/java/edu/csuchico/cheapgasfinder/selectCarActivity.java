@@ -1,9 +1,10 @@
 package edu.csuchico.cheapgasfinder;
 
-import android.app.Activity;
+import android.app.ListActivity;
 import android.content.Intent;
 import android.content.SharedPreferences;
 import android.os.Bundle;
+import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
@@ -15,10 +16,12 @@ import java.util.ArrayList;
 import java.util.Set;
 
 
-public class selectCarActivity extends Activity {
+public class selectCarActivity extends ListActivity {
 
     final static String PREFS_NAME = "UserPrefs";
     ListView carsListView;
+    ArrayList<String> carNames;
+    ArrayList<String> carJSONStrings;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -30,18 +33,26 @@ public class selectCarActivity extends Activity {
     public void onResume() {
         super.onResume();
 
-        carsListView = (ListView) findViewById(R.id.car_list);
-        ArrayList<String> carsStrings = getCars();
-        ArrayList<String> carList = new ArrayList<String>();
-        for (int i = 0; i < carsStrings.size(); i++) {
+        carsListView = (ListView) findViewById(android.R.id.list);
+        carJSONStrings = getCars();
+        carNames = new ArrayList<String>();
+        for (int i = 0; i < carJSONStrings.size(); i++) {
             Gson gson = new Gson();
-            Car car = gson.fromJson(carsStrings.get(i), Car.class);
-            carList.add(car.name);
+            Car car = gson.fromJson(carJSONStrings.get(i), Car.class);
+            carNames.add(car.name);
         }
-        ArrayAdapter<String> arrayAdapter = new ArrayAdapter<String>(this, android.R.layout.simple_list_item_1, carList);
+        ArrayAdapter<String> arrayAdapter
+                = new ArrayAdapter<String>(this, android.R.layout.simple_list_item_1, carNames);
         carsListView.setAdapter(arrayAdapter);
     }
 
+    @Override
+    protected void onListItemClick(ListView l, View v, int position, long id) {
+        Log.d("Car_selected", carNames.get(position));
+        Intent intent = new Intent(selectCarActivity.this, selectDestinationActivity.class);
+        intent.putExtra(Intent.EXTRA_TEXT, carJSONStrings.get(position));
+        startActivity(intent);
+    }
 
     @Override
     public boolean onCreateOptionsMenu(Menu menu) {

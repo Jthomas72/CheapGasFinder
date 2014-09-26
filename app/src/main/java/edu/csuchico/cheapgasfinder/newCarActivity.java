@@ -1,6 +1,7 @@
 package edu.csuchico.cheapgasfinder;
 
 import android.app.Activity;
+import android.content.Intent;
 import android.content.SharedPreferences;
 import android.os.Bundle;
 import android.os.StrictMode;
@@ -229,6 +230,9 @@ public class newCarActivity extends Activity implements AdapterView.OnItemSelect
 
         editor.putStringSet("cars", cars);
         editor.commit();
+
+        Intent intent = new Intent(newCarActivity.this, selectCarActivity.class);
+        startActivity(intent);
     }
 
 

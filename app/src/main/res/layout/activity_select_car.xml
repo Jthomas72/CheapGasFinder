@@ -9,7 +9,7 @@
     tools:context="edu.csuchico.cheapgasfinder.selectCarActivity">
 
     <ListView
-        android:id="@+id/car_list"
+        android:id="@android:id/list"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"></ListView>
 
