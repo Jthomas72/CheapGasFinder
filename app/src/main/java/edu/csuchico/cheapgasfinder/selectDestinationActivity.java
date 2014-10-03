@@ -1,17 +1,26 @@
 package edu.csuchico.cheapgasfinder;
 
 import android.app.Activity;
+import android.content.Context;
+import android.location.Location;
+import android.location.LocationListener;
+import android.location.LocationManager;
 import android.os.Bundle;
+import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
 
+import com.google.android.gms.maps.CameraUpdate;
+import com.google.android.gms.maps.CameraUpdateFactory;
 import com.google.android.gms.maps.GoogleMap;
 import com.google.android.gms.maps.MapFragment;
+import com.google.android.gms.maps.model.LatLng;
 
 
-public class selectDestinationActivity extends Activity {
+public class selectDestinationActivity extends Activity implements LocationListener {
 
-    GoogleMap map;
+    public GoogleMap map;
+    private LocationManager locationManager;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -19,6 +28,16 @@ public class selectDestinationActivity extends Activity {
         setContentView(R.layout.activity_select_destination);
 
         map = ((MapFragment) getFragmentManager().findFragmentById(R.id.map)).getMap();
+
+        locationManager = (LocationManager) getSystemService(Context.LOCATION_SERVICE);
+
+
+    }
+
+    @Override
+    protected void onResume() {
+        super.onResume();
+        locationManager.requestLocationUpdates(LocationManager.GPS_PROVIDER, 400, 1, this);
     }
 
 
@@ -39,5 +58,28 @@ public class selectDestinationActivity extends Activity {
             return true;
         }
         return super.onOptionsItemSelected(item);
+    }
+
+    @Override
+    public void onLocationChanged(Location location) {
+        Log.d("map", "onLocationChanged called");
+        LatLng latLng = new LatLng(location.getLatitude(), location.getLongitude());
+        CameraUpdate cameraUpdate = CameraUpdateFactory.newLatLngZoom(latLng, 10);
+        map.moveCamera(cameraUpdate);
+    }
+
+    @Override
+    public void onStatusChanged(String s, int i, Bundle bundle) {
+
+    }
+
+    @Override
+    public void onProviderEnabled(String s) {
+
+    }
+
+    @Override
+    public void onProviderDisabled(String s) {
+
     }
 }

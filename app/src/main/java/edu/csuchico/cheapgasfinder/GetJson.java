@@ -11,12 +11,25 @@ import org.json.JSONObject;
 import java.io.IOException;
 import java.net.URISyntaxException;
 
-
-public class GetJsonAPI  {
+/**
+ * Provides an easy way to get information from an API that
+ * returns JSON. This class should be used within another
+ * class specific to that API, a "model" with functions for
+ * specific API calls.
+ */
+public class GetJson {
     private String jsonstring;
     private String url;
 
-    public GetJsonAPI(String url) throws IOException {
+    /**
+     * Makes an API call to the provided URL and stores the results.
+     * Parse it with with either parseJSONArray or parseJSONObject,
+     * depending on the expected string to be returned.
+     *
+     * @param url A URL containing a JSON call.
+     * @throws IOException
+     */
+    public GetJson(String url) throws IOException {
         this.url = url;
         HttpClient httpClient = new DefaultHttpClient();
         HttpPost httpPost = new HttpPost(url);
@@ -29,10 +42,29 @@ public class GetJsonAPI  {
     public String getJSONString() {
         return jsonstring;
     }
+
+    /**
+     * Parses a JSON Object returned from the API. JSON objects
+     * are surrounded with curly braces and contain many fields
+     * with Strings or other data types. This function will
+     * strip any extra characters from the beginning and end of input.
+     *
+     * @return JSONObject
+     * @throws JSONException
+     */
     public JSONObject parseJSONObject() throws JSONException {
         return new JSONObject(this.jsonstring.substring(this.jsonstring.indexOf('{'), this.jsonstring.lastIndexOf('}') + 1));
     }
 
+    /**
+     * Parses a JSON Array returned from the API. JSON arrays
+     * contain many JSON objects. JSON arrays are surrounded by
+     * square brackets. This function will strip any extra
+     * characters from the beginning and end of input.
+     *
+     * @return JSONArray
+     * @throws JSONException
+     */
     public JSONArray parseJSONArray() throws JSONException {
         return new JSONArray(this.jsonstring.substring(this.jsonstring.indexOf('['), this.jsonstring.lastIndexOf(']') + 1));
     }
