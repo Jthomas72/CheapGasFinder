@@ -30,14 +30,25 @@ public class newCarActivity extends Activity implements AdapterView.OnItemSelect
     Car newCar;
     Cars cars;
 
+    /**
+     * Sets up the Activity view
+     *
+     * @param savedInstanceState This parameter is passed when the function gets called
+     *                           automatically
+     */
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_new_car);
 
+        /*
+         Allow networking to run in the main thread. This needs to be changed so networking
+         runs in its own thread, or the UI will lock up while waiting on the network
+        */
         StrictMode.ThreadPolicy policy = new StrictMode.ThreadPolicy.Builder().permitAll().build();
         StrictMode.setThreadPolicy(policy);
 
+        // Set up variables for accessing the elements of the view
         nameTextView = (TextView) findViewById(R.id.nickname_text);
         yearSpinner  = (Spinner) findViewById(R.id.year_spinner);
         makeSpinner  = (Spinner) findViewById(R.id.make_spinner);
@@ -45,15 +56,18 @@ public class newCarActivity extends Activity implements AdapterView.OnItemSelect
         trimSpinner  = (Spinner) findViewById(R.id.trim_spinner);
         textView     = (TextView) findViewById(R.id.car_info);
 
+        // Create a blank car object and object for accessing CarQueryAPI
         newCar = new Car();
         cars = new Cars(this);
         carQuery =  new CarQueryAPI();
 
+        // Listen for changes to the spinners
         yearSpinner.setOnItemSelectedListener(this);
         makeSpinner.setOnItemSelectedListener(this);
         modelSpinner.setOnItemSelectedListener(this);
         trimSpinner.setOnItemSelectedListener(this);
 
+        // Start by populating the year spinner
         try {
             populateYearSpinner();
         } catch (Exception e) {
@@ -61,6 +75,9 @@ public class newCarActivity extends Activity implements AdapterView.OnItemSelect
         }
     }
 
+    /*
+     * when something is selected, a spinner in this case, this function is called.
+     */
     @Override
     public void onItemSelected(AdapterView<?> adapterView, View view, int i, long l) {
         year = Integer.parseInt((String) yearSpinner.getSelectedItem());
@@ -68,6 +85,7 @@ public class newCarActivity extends Activity implements AdapterView.OnItemSelect
         model = (String) modelSpinner.getSelectedItem();
         trim = (String) trimSpinner.getSelectedItem();
 
+        // Take action depending on what was clicked
         switch (adapterView.getId()) {
             case R.id.year_spinner:
                 try {
@@ -100,6 +118,13 @@ public class newCarActivity extends Activity implements AdapterView.OnItemSelect
         }
     }
 
+    /**
+     * Adds available years to the year spinner from CarQueryAPI
+     *
+     * @throws IOException
+     * @throws JSONException
+     * @throws URISyntaxException
+     */
     public void populateYearSpinner()
             throws IOException, JSONException, URISyntaxException {
         ArrayList<String> yearList = carQuery.getYears();
@@ -109,6 +134,14 @@ public class newCarActivity extends Activity implements AdapterView.OnItemSelect
         yearSpinner.setAdapter(dataAdapter);
     }
 
+    /**
+     * Adds makes to the make spinner from CarQueryAPI
+     *
+     * @param year The year to get models for
+     * @throws IOException
+     * @throws URISyntaxException
+     * @throws JSONException
+     */
     public void populateMakeSpinner(int year)
             throws IOException, URISyntaxException, JSONException {
         ArrayList<String> makeList = carQuery.getMakes(year);
@@ -118,6 +151,15 @@ public class newCarActivity extends Activity implements AdapterView.OnItemSelect
         makeSpinner.setAdapter(dataAdapter);
     }
 
+    /**
+     * Adds models to the spinner from CarQueryAPI
+     *
+     * @param make The make to get models for
+     * @param year The year to get models for
+     * @throws IOException
+     * @throws URISyntaxException
+     * @throws JSONException
+     */
     public void populateModelSpinner(String make, int year)
             throws IOException, URISyntaxException, JSONException {
         ArrayList<String> modelList = carQuery.getModels(make, year);
@@ -127,6 +169,15 @@ public class newCarActivity extends Activity implements AdapterView.OnItemSelect
         modelSpinner.setAdapter(dataAdapter);
     }
 
+    /**
+     * Add makes to the spinner from CarQueryAPI
+     * @param model The model to get spinners for
+     * @param make The make to get models for
+     * @param year The year to get models for
+     * @throws IOException
+     * @throws URISyntaxException
+     * @throws JSONException
+     */
     private void populateTrimSpinner(String model, String make, int year)
             throws IOException, URISyntaxException, JSONException {
         trimMap = carQuery.getTrims(model, make, year);
@@ -136,6 +187,15 @@ public class newCarActivity extends Activity implements AdapterView.OnItemSelect
         trimSpinner.setAdapter(dataAdapter);
     }
 
+    /**
+     * Adds MPG and tank size information to the car info text box
+     * @param modelID The model ID to get information from. The model id comes
+     *                from CarQueryAPI when the trims are fetched.
+     *
+     * @throws IOException
+     * @throws URISyntaxException
+     * @throws JSONException
+     */
     public void updateCarInfo(int modelID) throws IOException, URISyntaxException, JSONException {
         Map<String, String> carInfo = carQuery.getCarInfo(modelID);
         newCar.setTankSize(Double.parseDouble(carInfo.get("mpg")));
@@ -144,6 +204,11 @@ public class newCarActivity extends Activity implements AdapterView.OnItemSelect
         textView.setText("MPG: " + newCar.getMpg() + " Tank Size: " + newCar.getTankSize());
     }
 
+    /**
+     * When the save car button is clicked, this function is called.
+     *
+     * @param view Automatically passed when this function is called
+     */
     public void saveCar(View view) {
         String name = nameTextView.getText().toString();
         newCar.setName(name);
