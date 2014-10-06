@@ -18,6 +18,10 @@ import java.net.URISyntaxException;
 import java.util.ArrayList;
 import java.util.Map;
 
+/**
+ * Handles events for activity_new_car.xml
+ *
+ */
 public class newCarActivity extends Activity implements AdapterView.OnItemSelectedListener {
     Spinner yearSpinner, makeSpinner, modelSpinner, trimSpinner;
     TextView nameTextView, textView;
@@ -31,10 +35,10 @@ public class newCarActivity extends Activity implements AdapterView.OnItemSelect
     Cars cars;
 
     /**
-     * Sets up the Activity view
+     * Sets up the elements of the new car view
      *
      * @param savedInstanceState This parameter is passed when the function gets called
-     *                           automatically
+     *                           automatically.
      */
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -75,11 +79,17 @@ public class newCarActivity extends Activity implements AdapterView.OnItemSelect
         }
     }
 
-    /*
+
+    /**
      * when something is selected, a spinner in this case, this function is called.
+     *
+     * @param adapterView The AdapterView where the selection happened
+     * @param view The view within the AdapterView that was clicked
+     * @param index The position of the view in the adapter
+     * @param id The row id of the item that is selected
      */
     @Override
-    public void onItemSelected(AdapterView<?> adapterView, View view, int i, long l) {
+    public void onItemSelected(AdapterView<?> adapterView, View view, int index, long id) {
         year = Integer.parseInt((String) yearSpinner.getSelectedItem());
         make = (String) makeSpinner.getSelectedItem();
         model = (String) modelSpinner.getSelectedItem();
@@ -171,6 +181,7 @@ public class newCarActivity extends Activity implements AdapterView.OnItemSelect
 
     /**
      * Add makes to the spinner from CarQueryAPI
+     *
      * @param model The model to get spinners for
      * @param make The make to get models for
      * @param year The year to get models for
