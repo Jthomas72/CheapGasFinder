@@ -17,6 +17,12 @@ import com.google.android.gms.maps.GoogleMap;
 import com.google.android.gms.maps.LocationSource;
 import com.google.android.gms.maps.MapFragment;
 import com.google.android.gms.maps.model.LatLng;
+import com.google.android.gms.maps.model.MarkerOptions;
+
+import org.json.JSONException;
+
+import java.io.IOException;
+import java.util.ArrayList;
 
 /**
  * Handles events for activity_select_destination.xml
@@ -25,6 +31,8 @@ import com.google.android.gms.maps.model.LatLng;
 public class selectDestinationActivity extends Activity implements LocationListener {
 
     private GoogleMap map;
+    private LocationManager locationManager;
+    MyGasFeedAPI myGasFeed;
 
     /**
      * Sets up the the elements of the select destination view
@@ -39,6 +47,48 @@ public class selectDestinationActivity extends Activity implements LocationListe
 
         map = ((MapFragment) getFragmentManager().findFragmentById(R.id.map)).getMap();
         map.setMyLocationEnabled(true); //Enables the button that moves the camera to user location
+        locationManager = (LocationManager) getSystemService(Context.LOCATION_SERVICE);
+        locationManager.requestLocationUpdates(LocationManager.NETWORK_PROVIDER, 60, 0, this);
+
+        myGasFeed = new MyGasFeedAPI();
+
+        try {
+            addStationMakers();
+        } catch (IOException e) {
+            e.printStackTrace();
+        } catch (JSONException e) {
+            e.printStackTrace();
+        }
+    }
+
+    /**
+     * Makes an API call to MyGasFeedAPI and populates the map with markers for each gas station
+     * @throws IOException
+     * @throws JSONException
+     */
+    private void addStationMakers() throws IOException, JSONException {
+        // TODO: This is causing a null pointer exception. Find out how to properly get user location.
+        /*Location l = locationManager.getLastKnownLocation(LocationManager.GPS_PROVIDER);
+        Log.d("GPS", "Lat: " + l.getLatitude());
+        Log.d("GPS", "Long: " + l.getLongitude());
+        */
+
+        // TODO: get current user location. This is the location for the center of Chico.
+        // TODO: Currently this uses a radius of 5 miles, but that should not be a constant value.
+        ArrayList <GasStation> stations = myGasFeed.getStations(39.728494, -121.837478, 5, "reg", "distance");
+
+        // For each station in stations
+        for (GasStation station : stations) {
+            double latitude = station.getLatitude();
+            double longitude = station.getLongitude();
+            String name = station.getName();
+            map.addMarker(new MarkerOptions()
+                .position(new LatLng(latitude, longitude))
+                .title(name)
+                .snippet("Regular: " + station.getRegPrice())
+            );
+        }
+
 
     }
 
@@ -49,6 +99,7 @@ public class selectDestinationActivity extends Activity implements LocationListe
     @Override
     protected void onResume() {
         super.onResume();
+
 
     }
 

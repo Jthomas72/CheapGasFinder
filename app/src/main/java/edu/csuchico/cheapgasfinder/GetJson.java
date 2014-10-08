@@ -2,6 +2,7 @@ package edu.csuchico.cheapgasfinder;
 
 import org.apache.http.HttpResponse;
 import org.apache.http.client.HttpClient;
+import org.apache.http.client.methods.HttpGet;
 import org.apache.http.client.methods.HttpPost;
 import org.apache.http.impl.client.DefaultHttpClient;
 import org.apache.http.util.EntityUtils;
@@ -32,8 +33,8 @@ public class GetJson {
     public GetJson(String url) throws IOException {
         this.url = url;
         HttpClient httpClient = new DefaultHttpClient();
-        HttpPost httpPost = new HttpPost(url);
-        HttpResponse httpResponse = httpClient.execute(httpPost);
+        HttpGet httpGet = new HttpGet(url);
+        HttpResponse httpResponse = httpClient.execute(httpGet);
         String jsonString = EntityUtils.toString(httpResponse.getEntity());
 
         this.jsonstring = jsonString;

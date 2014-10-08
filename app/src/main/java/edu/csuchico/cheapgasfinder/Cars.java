@@ -12,6 +12,7 @@ import java.util.Set;
 
 /**
  * Provides access the cars that have been saved in SharedPreferences
+ *
  */
 public class Cars {
     private Context context;
@@ -24,6 +25,7 @@ public class Cars {
     /**
      * Saves the car in SharedPreferences in JSON format, using
      * the Gson library.
+     *
      */
     public void save(Car car) {
         Gson gson = new Gson();
