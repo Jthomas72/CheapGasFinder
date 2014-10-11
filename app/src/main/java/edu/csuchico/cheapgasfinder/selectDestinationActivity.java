@@ -2,14 +2,15 @@ package edu.csuchico.cheapgasfinder;
 
 import android.app.Activity;
 import android.location.Location;
-import android.location.LocationListener;
-import android.location.LocationManager;
 import android.os.Bundle;
 import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
 
+import com.google.android.gms.common.ConnectionResult;
+import com.google.android.gms.common.GooglePlayServicesClient;
 import com.google.android.gms.common.GooglePlayServicesUtil;
+import com.google.android.gms.location.LocationClient;
 import com.google.android.gms.maps.GoogleMap;
 import com.google.android.gms.maps.MapFragment;
 import com.google.android.gms.maps.model.LatLng;
@@ -25,13 +26,15 @@ import java.util.ArrayList;
  * Handles events for activity_select_destination.xml
  *
  */
-public class selectDestinationActivity extends Activity implements LocationListener {
+public class selectDestinationActivity extends Activity implements
+        GooglePlayServicesClient.ConnectionCallbacks,
+        GooglePlayServicesClient.OnConnectionFailedListener {
 
     private GoogleMap map;
-    private LocationManager locationManager;
-    MyGasFeedAPI myGasFeed;
-    Bundle extras;
-    Car car;
+    private LocationClient locationClient;
+    private MyGasFeedAPI myGasFeed;
+    private Bundle extras;
+    private Car car;
 
     /**
      * Sets up the the elements of the select destination view
@@ -44,8 +47,7 @@ public class selectDestinationActivity extends Activity implements LocationListe
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_select_destination);
 
-        // locationManager = (LocationManager) getSystemService(Context.LOCATION_SERVICE);
-        // locationManager.requestLocationUpdates(LocationManager.NETWORK_PROVIDER, 60, 0, this);
+        locationClient = new LocationClient(this, this, this);
 
         myGasFeed = new MyGasFeedAPI();
 
@@ -61,15 +63,13 @@ public class selectDestinationActivity extends Activity implements LocationListe
      * @throws JSONException
      */
     private void addStationMakers() throws IOException, JSONException {
-        // TODO: This is causing a null pointer exception. Find out how to properly get user location.
-        /*Location l = locationManager.getLastKnownLocation(LocationManager.GPS_PROVIDER);
-        Log.d("GPS", "Lat: " + l.getLatitude());
-        Log.d("GPS", "Long: " + l.getLongitude());
-        */
+        Location currentLocation;
+        currentLocation = locationClient.getLastLocation();
 
-        // TODO: get current user location. This is the location for the center of Chico.
         // TODO: Currently this uses a radius of 5 miles, but that should not be a constant value.
-        ArrayList <GasStation> stations = myGasFeed.getStations(39.728494, -121.837478, 5, "reg", "distance");
+        ArrayList <GasStation> stations
+                = myGasFeed.getStations(currentLocation.getLatitude(), currentLocation.getLongitude(),
+                  5, "reg", "distance");
 
         // For each station in stations
         for (GasStation station : stations) {
@@ -86,7 +86,6 @@ public class selectDestinationActivity extends Activity implements LocationListe
                 price = station.getPrePrice();
             else if (car.getFuelType().equals("Diesel"))
                 price = station.getDieselPrice();
-            else Log.d("fuel_type unknown", car.getFuelType());
 
             map.addMarker(new MarkerOptions()
                 .position(new LatLng(latitude, longitude))
@@ -114,17 +113,36 @@ public class selectDestinationActivity extends Activity implements LocationListe
                 break;
         }
 
+        locationClient.connect();
+
         map = ((MapFragment) getFragmentManager().findFragmentById(R.id.map)).getMap();
         map.setMyLocationEnabled(true); //Enables the button that moves the camera to user location
+    }
 
+    /**
+     * Called when the activity is no longer visible.
+     *
+     */
+    @Override
+    protected void onStop() {
+        locationClient.disconnect();
+        super.onStop();
+    }
+
+    /**
+     * After calling connect(), this method will be called when the connection has
+     * completed successfully.
+     *
+     * @param connectionHint Bundle of data provided to clients by Google Play services.
+     *                       May be null if no content is provided by the service.
+     */
+    @Override
+    public void onConnected(Bundle connectionHint) {
         try {
             addStationMakers();
-        } catch (IOException e) {
-            e.printStackTrace();
-        } catch (JSONException e) {
+        } catch (Exception e) {
             e.printStackTrace();
         }
-
     }
 
 
@@ -148,23 +166,12 @@ public class selectDestinationActivity extends Activity implements LocationListe
     }
 
     @Override
-    public void onLocationChanged(Location location) {
-        Log.d("map", "onLocationChanged called");
+    public void onDisconnected() {
 
     }
 
     @Override
-    public void onStatusChanged(String s, int i, Bundle bundle) {
-
-    }
-
-    @Override
-    public void onProviderEnabled(String s) {
-
-    }
-
-    @Override
-    public void onProviderDisabled(String s) {
+    public void onConnectionFailed(ConnectionResult connectionResult) {
 
     }
 }
