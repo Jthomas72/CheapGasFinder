@@ -11,6 +11,7 @@ import com.google.android.gms.common.ConnectionResult;
 import com.google.android.gms.common.GooglePlayServicesClient;
 import com.google.android.gms.common.GooglePlayServicesUtil;
 import com.google.android.gms.location.LocationClient;
+import com.google.android.gms.maps.CameraUpdateFactory;
 import com.google.android.gms.maps.GoogleMap;
 import com.google.android.gms.maps.MapFragment;
 import com.google.android.gms.maps.model.LatLng;
@@ -66,10 +67,10 @@ public class selectDestinationActivity extends Activity implements
         Location currentLocation;
         currentLocation = locationClient.getLastLocation();
 
-        // TODO: Currently this uses a radius of 5 miles, but that should not be a constant value.
+        // TODO: Currently this uses a radius of 50 miles, but it should be adjustable
         ArrayList <GasStation> stations
                 = myGasFeed.getStations(currentLocation.getLatitude(), currentLocation.getLongitude(),
-                  5, "reg", "distance");
+                  50, "reg", "distance");
 
         // For each station in stations
         for (GasStation station : stations) {
@@ -138,6 +139,13 @@ public class selectDestinationActivity extends Activity implements
      */
     @Override
     public void onConnected(Bundle connectionHint) {
+        Location currentLocation;
+        currentLocation = locationClient.getLastLocation();
+        float zoomLevel = 12; // From 2.0 - 21.0, how far to zoom in. Larger numbers are zoomed in more.
+        map.moveCamera(CameraUpdateFactory.newLatLngZoom(
+                        new LatLng(currentLocation.getLatitude(), currentLocation.getLongitude()), zoomLevel )
+        );
+
         try {
             addStationMakers();
         } catch (Exception e) {
