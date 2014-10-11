@@ -5,12 +5,12 @@ package edu.csuchico.cheapgasfinder;
  * stored and loaded with the Cars class.
  */
 public class Car {
-    String name;
-    String make;
-    String model;
-    String trim;
-    int year;
-    double mpg, tankSize;
+    private String name, make, model, trim, fuelType;
+    private int year;
+    private double mpg, tankSize;
+
+    public Car() {
+    }
 
     public String getName() { return name; }
     public void setName(String name) { this.name = name; }
@@ -33,7 +33,7 @@ public class Car {
     public double getTankSize() { return tankSize; }
     public void setTankSize(double tankSize) { this.tankSize = tankSize; }
 
-    public Car() {
-    }
+    public String getFuelType() { return fuelType; }
+    public void setFuelType(String fuelType) { this.fuelType = fuelType; }
 }
 

@@ -199,7 +199,7 @@ public class newCarActivity extends Activity implements AdapterView.OnItemSelect
     }
 
     /**
-     * Adds MPG and tank size information to the car info text box
+     * Adds MPG, fuel type, tank size information to the car info text box
      * @param modelID The model ID to get information from. The model id comes
      *                from CarQueryAPI when the trims are fetched.
      *
@@ -211,8 +211,11 @@ public class newCarActivity extends Activity implements AdapterView.OnItemSelect
         Map<String, String> carInfo = carQuery.getCarInfo(modelID);
         newCar.setTankSize(Double.parseDouble(carInfo.get("mpg")));
         newCar.setMpg(Double.parseDouble(carInfo.get("tankSize")));
+        newCar.setFuelType(carInfo.get("fuelType"));
         TextView textView = (TextView) findViewById(R.id.car_info);
-        textView.setText("MPG: " + newCar.getMpg() + " Tank Size: " + newCar.getTankSize());
+        textView.setText("MPG: " + newCar.getMpg()
+                + "\nTank Size: " + newCar.getTankSize()
+                + "\nFuel type: " + newCar.getFuelType());
     }
 
     /**

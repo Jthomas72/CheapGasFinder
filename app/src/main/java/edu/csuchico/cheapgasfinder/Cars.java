@@ -89,7 +89,7 @@ public class Cars {
         for (int i = 0; i < carsJSON.size(); i++) {
             Gson gson = new Gson();
             Car newCar = gson.fromJson(carsJSON.get(i), Car.class);
-            carNames.add(newCar.name);
+            carNames.add(newCar.getName());
         }
 
         return carNames;

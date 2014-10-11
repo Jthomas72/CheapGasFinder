@@ -116,8 +116,7 @@ public class CarQueryAPI {
     }
 
     /**
-     * Updates the TextView with MPG and tanksize info. Returns a Map with
-     * MPG and tank size information.
+     * Returns a Map with MPG and tank size information.
      *
      * @param modelID The modelID of the trim to get info for. This ID comes from
      *                the JSON call to get trim information.
@@ -129,12 +128,25 @@ public class CarQueryAPI {
         Map<String, String> infoHash = new HashMap<String, String>();
         String jsonURL = GET_MODEL_DATA_URL + "&model=" + modelID;
         Log.d("JSON_URL", jsonURL);
-        GetJson jsonAPI = new GetJson(jsonURL);
-        Log.d("JSON_out", jsonAPI.getJSONString());
+        GetJson carQueryAPI = new GetJson(jsonURL);
+        Log.d("JSON_out", carQueryAPI.getJSONString());
 
-        JSONObject carInfo = jsonAPI.parseJSONArray().getJSONObject(0);
+        JSONObject carInfo = carQueryAPI.parseJSONArray().getJSONObject(0);
         infoHash.put("mpg", carInfo.getString("model_mpg_city"));
         infoHash.put("tankSize", carInfo.getString("model_fuel_cap_g"));
+
+        String fuelType = carInfo.getString("model_engine_fuel");
+        if (fuelType.contains("Regular"))
+            fuelType = "Regular";
+        else if (fuelType.contains("Mid"))
+            fuelType = "Mid";
+        else if (fuelType.contains("Premium"))
+            fuelType = "Premium";
+        else if (fuelType.contains("Diesel"))
+            fuelType = "Diesel";
+        else fuelType = "Unknown";
+
+        infoHash.put("fuelType", fuelType);
 
         return infoHash;
     }
