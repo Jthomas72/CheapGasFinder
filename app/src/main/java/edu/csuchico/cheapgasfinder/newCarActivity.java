@@ -199,7 +199,7 @@ public class newCarActivity extends Activity implements AdapterView.OnItemSelect
     }
 
     /**
-     * Adds MPG, fuel type, tank size information to the car info text box
+     * Adds MPG, fuel type, and tank size information to the car info text box
      * @param modelID The model ID to get information from. The model id comes
      *                from CarQueryAPI when the trims are fetched.
      *

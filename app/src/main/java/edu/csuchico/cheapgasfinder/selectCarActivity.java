@@ -62,7 +62,7 @@ public class selectCarActivity extends ListActivity {
     protected void onListItemClick(ListView l, View v, int position, long id) {
         Log.d("Car_selected", cars.getCars().get(position).getName());
         Intent intent = new Intent(selectCarActivity.this, selectDestinationActivity.class);
-        intent.putExtra(Intent.EXTRA_TEXT, cars.getCarsJSON().get(position));
+        intent.putExtra("car_json", cars.getCarsJSON().get(position));
         startActivity(intent);
     }
 

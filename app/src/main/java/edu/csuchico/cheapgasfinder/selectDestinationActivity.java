@@ -1,8 +1,6 @@
 package edu.csuchico.cheapgasfinder;
 
 import android.app.Activity;
-import android.content.Context;
-import android.location.GpsSatellite;
 import android.location.Location;
 import android.location.LocationListener;
 import android.location.LocationManager;
@@ -12,13 +10,11 @@ import android.view.Menu;
 import android.view.MenuItem;
 
 import com.google.android.gms.common.GooglePlayServicesUtil;
-import com.google.android.gms.maps.CameraUpdate;
-import com.google.android.gms.maps.CameraUpdateFactory;
 import com.google.android.gms.maps.GoogleMap;
-import com.google.android.gms.maps.LocationSource;
 import com.google.android.gms.maps.MapFragment;
 import com.google.android.gms.maps.model.LatLng;
 import com.google.android.gms.maps.model.MarkerOptions;
+import com.google.gson.Gson;
 
 import org.json.JSONException;
 
@@ -34,6 +30,8 @@ public class selectDestinationActivity extends Activity implements LocationListe
     private GoogleMap map;
     private LocationManager locationManager;
     MyGasFeedAPI myGasFeed;
+    Bundle extras;
+    Car car;
 
     /**
      * Sets up the the elements of the select destination view
@@ -51,7 +49,9 @@ public class selectDestinationActivity extends Activity implements LocationListe
 
         myGasFeed = new MyGasFeedAPI();
 
-
+        Gson gson = new Gson();
+        extras = getIntent().getExtras();
+        car = gson.fromJson(extras.getString("car_json"), Car.class);
     }
 
     /**
@@ -76,10 +76,22 @@ public class selectDestinationActivity extends Activity implements LocationListe
             double latitude = station.getLatitude();
             double longitude = station.getLongitude();
             String name = station.getName();
+
+            double price = 0;
+            if (car.getFuelType().equals("Regular"))
+                price = station.getPrePrice();
+            else if (car.getFuelType().equals("Mid"))
+                price = station.getMidPrice();
+            else if (car.getFuelType().equals("Premium"))
+                price = station.getPrePrice();
+            else if (car.getFuelType().equals("Diesel"))
+                price = station.getDieselPrice();
+            else Log.d("fuel_type unknown", car.getFuelType());
+
             map.addMarker(new MarkerOptions()
                 .position(new LatLng(latitude, longitude))
                 .title(name)
-                .snippet("Regular: " + station.getRegPrice())
+                .snippet(car.getFuelType() + ": " + price)
             );
         }
     }
