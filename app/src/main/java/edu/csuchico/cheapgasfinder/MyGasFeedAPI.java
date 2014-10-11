@@ -51,18 +51,45 @@ public class MyGasFeedAPI {
 
         JSONArray jsonArray = jsonAPI.parseJSONObject().getJSONArray("stations");
 
-        // TODO: add more data, such as gas prices to the GasStation object
+        // TODO: add more data, such as last time updated to GasStation objects
         for (int i = 0; i < jsonArray.length(); i++) {
             GasStation newStation = new GasStation();
             JSONObject stationJSON = jsonArray.getJSONObject(i);
             newStation.setName(stationJSON.getString("station"));
             newStation.setAddress(stationJSON.getString("address"));
+            newStation.setCity(stationJSON.getString("city"));
+            newStation.setRegion(stationJSON.getString("region"));
             newStation.setLongitude(stationJSON.getDouble("lng"));
             newStation.setLatitude(stationJSON.getDouble("lat"));
+
+            String regPrice = stationJSON.getString("reg_price");
+            if (validGasPrice(regPrice))
+                newStation.setRegPrice(Double.parseDouble(regPrice));
+
+            String midPrice = stationJSON.getString("mid_price");
+            if (validGasPrice(midPrice))
+                newStation.setMidPrice(Double.parseDouble(midPrice));
+
+            String prePrice = stationJSON.getString("pre_price");
+            if (validGasPrice(prePrice))
+                newStation.setPrePrice(Double.parseDouble(prePrice));
+
+            String dieselPrice = stationJSON.getString("diesel_price");
+            if (validGasPrice(dieselPrice))
+                newStation.setDieselPrice(Double.parseDouble(dieselPrice));
 
             stationList.add(newStation);
         }
 
         return stationList;
+    }
+
+    /**
+     * @param price A string containing the price
+     * @return true if the price is in the format X.XX. The API will
+     *         return a non-double value if it has no data for a station's price
+     */
+    private boolean validGasPrice(String price) {
+        return price.matches("^[0-9](\\.[0-9]{2})$");
     }
 }
