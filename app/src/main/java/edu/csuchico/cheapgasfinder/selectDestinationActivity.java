@@ -11,6 +11,7 @@ import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
 
+import com.google.android.gms.common.GooglePlayServicesUtil;
 import com.google.android.gms.maps.CameraUpdate;
 import com.google.android.gms.maps.CameraUpdateFactory;
 import com.google.android.gms.maps.GoogleMap;
@@ -45,24 +46,17 @@ public class selectDestinationActivity extends Activity implements LocationListe
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_select_destination);
 
-        map = ((MapFragment) getFragmentManager().findFragmentById(R.id.map)).getMap();
-        map.setMyLocationEnabled(true); //Enables the button that moves the camera to user location
-        locationManager = (LocationManager) getSystemService(Context.LOCATION_SERVICE);
-        locationManager.requestLocationUpdates(LocationManager.NETWORK_PROVIDER, 60, 0, this);
+        // locationManager = (LocationManager) getSystemService(Context.LOCATION_SERVICE);
+        // locationManager.requestLocationUpdates(LocationManager.NETWORK_PROVIDER, 60, 0, this);
 
         myGasFeed = new MyGasFeedAPI();
 
-        try {
-            addStationMakers();
-        } catch (IOException e) {
-            e.printStackTrace();
-        } catch (JSONException e) {
-            e.printStackTrace();
-        }
+
     }
 
     /**
      * Makes an API call to MyGasFeedAPI and populates the map with markers for each gas station
+     *
      * @throws IOException
      * @throws JSONException
      */
@@ -88,8 +82,6 @@ public class selectDestinationActivity extends Activity implements LocationListe
                 .snippet("Regular: " + station.getRegPrice())
             );
         }
-
-
     }
 
     /**
@@ -100,6 +92,26 @@ public class selectDestinationActivity extends Activity implements LocationListe
     protected void onResume() {
         super.onResume();
 
+        switch (GooglePlayServicesUtil.isGooglePlayServicesAvailable(this)) {
+            case 2: //out date
+                try {
+                    GooglePlayServicesUtil.getErrorDialog(2, this, 0).show();
+                } catch (Exception e) {
+                    e.printStackTrace();
+                }
+                break;
+        }
+
+        map = ((MapFragment) getFragmentManager().findFragmentById(R.id.map)).getMap();
+        map.setMyLocationEnabled(true); //Enables the button that moves the camera to user location
+
+        try {
+            addStationMakers();
+        } catch (IOException e) {
+            e.printStackTrace();
+        } catch (JSONException e) {
+            e.printStackTrace();
+        }
 
     }
 
