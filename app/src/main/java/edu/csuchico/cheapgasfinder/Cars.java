@@ -50,8 +50,17 @@ public class Cars {
      */
     public ArrayList<String> getCarsJSON() {
         Set<String> cars = context.getSharedPreferences(PREFS_NAME, 0).getStringSet("cars", null);
+        ArrayList<String> carsList;
 
-        return new ArrayList<String>(cars);
+        /* If there is no preferences file, such as when this app is opened for the first time,
+        cars will be null, and so will the resulting ArrayList, so this makes a blank one. The app
+        will crash otherwise when there are no saved cars. */
+        if (cars != null) {
+            carsList = new ArrayList<String>(cars);
+        } else {
+           carsList = new ArrayList<String>();
+        }
+        return carsList;
     }
 
     /**

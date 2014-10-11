@@ -42,9 +42,12 @@ public class selectCarActivity extends ListActivity {
         carsListView = (ListView) findViewById(android.R.id.list);
         cars = new Cars(this);
 
-        ArrayAdapter<String> arrayAdapter
-                = new ArrayAdapter<String>(this, android.R.layout.simple_list_item_1, cars.getCarsNames());
-        carsListView.setAdapter(arrayAdapter);
+        // only attempt to load cars if the list is non-empty
+        if (!cars.getCarsNames().isEmpty()) {
+            ArrayAdapter<String> arrayAdapter
+                    = new ArrayAdapter<String>(this, android.R.layout.simple_list_item_1, cars.getCarsNames());
+            carsListView.setAdapter(arrayAdapter);
+        }
     }
 
     /**
