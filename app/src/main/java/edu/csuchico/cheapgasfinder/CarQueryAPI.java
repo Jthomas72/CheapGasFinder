@@ -151,4 +151,3 @@ public class CarQueryAPI {
         return infoHash;
     }
 }
-
