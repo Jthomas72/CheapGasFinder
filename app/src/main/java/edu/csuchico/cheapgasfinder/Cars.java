@@ -18,6 +18,12 @@ public class Cars {
     private Context context;
     final static String PREFS_NAME = "UserPrefs";
 
+    /**
+     * Instantiates a new Cars object
+     *
+     * @param context A Context is needed to use SharedPreferences. From an Activity, you can
+     *                pass this, for example: Cars cars = new Cars(this).
+     */
     public Cars(Context context) {
         this.context = context;
     }
@@ -25,7 +31,6 @@ public class Cars {
     /**
      * Saves the car in SharedPreferences in JSON format, using
      * the Gson library.
-     *
      */
     public void save(Car car) {
         Gson gson = new Gson();
@@ -41,7 +46,7 @@ public class Cars {
         cars.add(carJson);
 
         editor.putStringSet("cars", cars);
-        editor.commit();
+        editor.apply(); // apply() writes to preferences asynchronously, and commit() doesn't
     }
 
     /**
@@ -70,9 +75,9 @@ public class Cars {
         ArrayList<String> carsJSON = this.getCarsJSON();
         ArrayList<Car> cars = new ArrayList<Car>();
 
-        for (int i = 0; i < carsJSON.size(); i++) {
+        for (String carJSON : carsJSON) { // for each carJSON in carsJSON
             Gson gson = new Gson();
-            Car newCar = gson.fromJson(carsJSON.get(i), Car.class);
+            Car newCar = gson.fromJson(carJSON, Car.class);
             cars.add(newCar);
         }
 
@@ -86,9 +91,9 @@ public class Cars {
         ArrayList<String> carsJSON = this.getCarsJSON();
         ArrayList<String> carNames = new ArrayList<String>();
 
-        for (int i = 0; i < carsJSON.size(); i++) {
+        for (String carJSON : carsJSON) { // for each carJSON in carsJSON
             Gson gson = new Gson();
-            Car newCar = gson.fromJson(carsJSON.get(i), Car.class);
+            Car newCar = gson.fromJson(carJSON, Car.class);
             carNames.add(newCar.getName());
         }
 
