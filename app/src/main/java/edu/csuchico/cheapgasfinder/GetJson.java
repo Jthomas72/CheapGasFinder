@@ -3,14 +3,12 @@ package edu.csuchico.cheapgasfinder;
 import org.apache.http.HttpResponse;
 import org.apache.http.client.HttpClient;
 import org.apache.http.client.methods.HttpGet;
-import org.apache.http.client.methods.HttpPost;
 import org.apache.http.impl.client.DefaultHttpClient;
 import org.apache.http.util.EntityUtils;
 import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
 import java.io.IOException;
-import java.net.URISyntaxException;
 
 /**
  * Provides an easy way to get information from an API that
@@ -20,7 +18,6 @@ import java.net.URISyntaxException;
  */
 public class GetJson {
     private String jsonstring;
-    private String url;
 
     /**
      * Makes an API call to the provided URL and stores the results.
@@ -31,13 +28,10 @@ public class GetJson {
      * @throws IOException
      */
     public GetJson(String url) throws IOException {
-        this.url = url;
         HttpClient httpClient = new DefaultHttpClient();
         HttpGet httpGet = new HttpGet(url);
         HttpResponse httpResponse = httpClient.execute(httpGet);
-        String jsonString = EntityUtils.toString(httpResponse.getEntity());
-
-        this.jsonstring = jsonString;
+        this.jsonstring = EntityUtils.toString(httpResponse.getEntity());
     }
 
     public String getJSONString() {
