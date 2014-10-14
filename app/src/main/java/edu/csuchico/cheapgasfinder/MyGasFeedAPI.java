@@ -61,6 +61,7 @@ public class MyGasFeedAPI {
             newStation.setRegion(stationJSON.getString("region"));
             newStation.setLongitude(stationJSON.getDouble("lng"));
             newStation.setLatitude(stationJSON.getDouble("lat"));
+            newStation.setDistance(stationJSON.getString("distance"));
 
             String regPrice = stationJSON.getString("reg_price");
             if (validGasPrice(regPrice))

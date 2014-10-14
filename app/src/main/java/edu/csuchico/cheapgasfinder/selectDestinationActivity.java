@@ -78,20 +78,13 @@ public class selectDestinationActivity extends Activity implements
             double longitude = station.getLongitude();
             String name = station.getName();
 
-            double price = 0;
-            if (car.getFuelType().equals("Regular"))
-                price = station.getPrePrice();
-            else if (car.getFuelType().equals("Mid"))
-                price = station.getMidPrice();
-            else if (car.getFuelType().equals("Premium"))
-                price = station.getPrePrice();
-            else if (car.getFuelType().equals("Diesel"))
-                price = station.getDieselPrice();
+            GasPrice gasPrice = new GasPrice(station, car, true);
+            double totalPrice = gasPrice.getTotalPrice(car.getTankSize());
 
             map.addMarker(new MarkerOptions()
                 .position(new LatLng(latitude, longitude))
                 .title(name)
-                .snippet(car.getFuelType() + ": " + price)
+                .snippet("Total Price: $ " + totalPrice)
             );
         }
     }

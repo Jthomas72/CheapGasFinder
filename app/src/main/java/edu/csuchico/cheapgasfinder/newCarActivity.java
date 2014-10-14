@@ -90,15 +90,11 @@ public class newCarActivity extends Activity implements AdapterView.OnItemSelect
      */
     @Override
     public void onItemSelected(AdapterView<?> adapterView, View view, int index, long id) {
-        year = Integer.parseInt((String) yearSpinner.getSelectedItem());
-        make = (String) makeSpinner.getSelectedItem();
-        model = (String) modelSpinner.getSelectedItem();
-        trim = (String) trimSpinner.getSelectedItem();
-
         // Take action depending on what was clicked
         switch (adapterView.getId()) {
             case R.id.year_spinner:
                 try {
+                    year = Integer.parseInt((String) yearSpinner.getSelectedItem());
                     populateMakeSpinner(year);
                     newCar.setYear(year);
                     Log.d("year_value", Integer.toString(year));
@@ -106,6 +102,7 @@ public class newCarActivity extends Activity implements AdapterView.OnItemSelect
                 break;
             case R.id.make_spinner:
                 try {
+                    make = (String) makeSpinner.getSelectedItem();
                     populateModelSpinner(make, year);
                     newCar.setMake(make);
                     Log.d("make_value", make);
@@ -113,6 +110,7 @@ public class newCarActivity extends Activity implements AdapterView.OnItemSelect
                 break;
             case R.id.model_spinner:
                 try {
+                    model = (String) modelSpinner.getSelectedItem();
                     populateTrimSpinner(model, make, year);
                     newCar.setModel(model);
                     Log.d("model_value", model);
@@ -120,6 +118,7 @@ public class newCarActivity extends Activity implements AdapterView.OnItemSelect
                 break;
             case R.id.trim_spinner:
                 try {
+                    trim = (String) trimSpinner.getSelectedItem();
                     int modelID = trimMap.get(trim);
                     newCar.setTrim(trim);
                     updateCarInfo(modelID);

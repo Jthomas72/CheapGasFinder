@@ -66,6 +66,10 @@ public class GasStation {
         this.distance = distance;
     }
 
+    public void setDistance(String distance) {
+        this.distance = distanceStringtoDouble(distance);
+    }
+
     public String getAddress() {
         return address;
     }
@@ -96,5 +100,20 @@ public class GasStation {
 
     public void setName(String name) {
         this.name = name;
+    }
+
+    /**
+     * Converts a String describing the distance into a double containing the distance in miles.
+     *
+     * @param dist String describing a distance, like "0.5 miles." This should only end in miles.
+     * @return A double containing a distance in miles
+     */
+    private double distanceStringtoDouble(String dist) {
+        String distance[] = dist.split(" ");
+
+        if (BuildConfig.DEBUG && !(distance[1].equals("miles")))
+            throw new RuntimeException("Distance should be in miles");
+
+        return Double.parseDouble(distance[0]);
     }
 }
