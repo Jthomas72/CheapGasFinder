@@ -39,17 +39,31 @@ public class MyGasFeedAPI {
         (double latitude, double longitude, double distance, String fuelType, String sortBy)
         throws IOException, JSONException {
 
+        private static final String TAG = "ThreadingStart";
+
         ArrayList<GasStation> stationList = new ArrayList<GasStation>();
 
         final String REQUEST_URL = API_URL + "/stations/radius/"
             + latitude + "/" + longitude + "/" + distance + "/" + fuelType + "/"
             + sortBy + "/" + API_KEY + ".json";
 
-        Log.d("JSON_url", REQUEST_URL);
-        GetJson jsonAPI = new GetJson(REQUEST_URL);
-        Log.w("JSON_out", jsonAPI.getJSONString());
+        //TODO: complete thread opperations and begin handler
+        Log.i(TAG, "Beginning threading request now.");
 
-        JSONArray jsonArray = jsonAPI.parseJSONObject().getJSONArray("stations");
+        Runnable runnable = new Runnable() {
+        	public void run() {
+        		Log.d("JSON_url", REQUEST_URL);
+        		GetJson jsonAPI = new GetJson(REQUEST_URL);
+        		Log.w("JSON_out", jsonAPI.getJSONString());
+        		JSONArray jsonArray = jsonAPI.parseJSONObject().getJSONArray("stations");
+        		
+
+        	}
+        }
+        Thread mythread = new Thread(runnable);
+        mythread.start();
+
+        
 
         // TODO: add more data, such as last time updated to GasStation objects
         for (int i = 0; i < jsonArray.length(); i++) {
