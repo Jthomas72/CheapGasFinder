@@ -114,6 +114,7 @@ public class GasStation {
         if (BuildConfig.DEBUG && !(distance[1].equals("miles")))
             throw new RuntimeException("Distance should be in miles");
 
+        // distance[0] should contain a double
         return Double.parseDouble(distance[0]);
     }
 }

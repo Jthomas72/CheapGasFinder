@@ -144,7 +144,9 @@ public class CarQueryAPI {
             fuelType = "Premium";
         else if (fuelType.contains("Diesel"))
             fuelType = "Diesel";
-        else fuelType = "Unknown";
+        else if (BuildConfig.DEBUG)
+            throw new RuntimeException("Unknown fuel type");
+
 
         infoHash.put("fuelType", fuelType);
 
