@@ -3,7 +3,7 @@ package edu.csuchico.cheapgasfinder;
 import android.app.Activity;
 import android.location.Location;
 import android.os.Bundle;
-import android.util.Log;
+import android.os.StrictMode;
 import android.view.Menu;
 import android.view.MenuItem;
 
@@ -48,6 +48,13 @@ public class selectDestinationActivity extends Activity implements
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_select_destination);
 
+        /*
+         Allow networking to run in the main thread. This needs to be changed so networking
+         runs in its own thread, or the UI will lock up while waiting on the network
+        */
+        StrictMode.ThreadPolicy policy = new StrictMode.ThreadPolicy.Builder().permitAll().build();
+        StrictMode.setThreadPolicy(policy);
+
         locationClient = new LocationClient(this, this, this);
 
         myGasFeed = new MyGasFeedAPI();
@@ -81,30 +88,33 @@ public class selectDestinationActivity extends Activity implements
             GasPrice gasPrice = new GasPrice(station, car, true);
             double totalPrice = gasPrice.getTotalPrice(car.getTankSize());
 
+            String markerText;
+            if (totalPrice != 0)
+                markerText = "Total Price: $ " + totalPrice;
+            else
+                markerText = "Price not available.";
+
             map.addMarker(new MarkerOptions()
                 .position(new LatLng(latitude, longitude))
                 .title(name)
-                .snippet("Total Price: $ " + totalPrice)
+                .snippet(markerText)
             );
         }
     }
 
     /**
      * Called when the activity will start interacting with the user.
-     *
      */
     @Override
     protected void onResume() {
         super.onResume();
 
-        switch (GooglePlayServicesUtil.isGooglePlayServicesAvailable(this)) {
-            case 2: //out date
-                try {
-                    GooglePlayServicesUtil.getErrorDialog(2, this, 0).show();
-                } catch (Exception e) {
-                    e.printStackTrace();
-                }
-                break;
+        if (GooglePlayServicesUtil.isGooglePlayServicesAvailable(this) != ConnectionResult.SUCCESS ) {
+            try {
+                GooglePlayServicesUtil.getErrorDialog(2, this, 0).show();
+            } catch (Exception e) {
+                e.printStackTrace();
+            }
         }
 
         locationClient.connect();
@@ -134,6 +144,7 @@ public class selectDestinationActivity extends Activity implements
     public void onConnected(Bundle connectionHint) {
         Location currentLocation;
         currentLocation = locationClient.getLastLocation();
+
         float zoomLevel = 12; // From 2.0 - 21.0, how far to zoom in. Larger numbers are zoomed in more.
         map.moveCamera(CameraUpdateFactory.newLatLngZoom(
                         new LatLng(currentLocation.getLatitude(), currentLocation.getLongitude()), zoomLevel )
@@ -145,7 +156,6 @@ public class selectDestinationActivity extends Activity implements
             e.printStackTrace();
         }
     }
-
 
     @Override
     public boolean onCreateOptionsMenu(Menu menu) {
