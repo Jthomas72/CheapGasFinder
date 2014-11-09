@@ -21,8 +21,23 @@ public class MyGasFeedAPI {
     final static String API_URL = "http://api.mygasfeed.com/";
     final static String API_KEY = "vtn4c3fycf";
 
+    private JSONArray jsonArray;
+
+    /**
+     * Default constructor for MyGasFeedAPI
+     */
     public MyGasFeedAPI() {
         Log.d("JSON", "MyGasFeedAPI object created.");
+    }
+
+    /**
+     * This constructor overrides the API calls for testing.
+     *
+     * @param jsonArray A JSONArray formatted to MyGasFeed's specifications, containing stations.
+     */
+    public MyGasFeedAPI(JSONArray jsonArray) {
+        Log.d("JSON", "MyGasFeedAPI object created.");
+        this.jsonArray = jsonArray;
     }
 
     /**
@@ -39,19 +54,19 @@ public class MyGasFeedAPI {
         (double latitude, double longitude, double distance, String fuelType, String sortBy)
         throws IOException, JSONException {
 
-        ArrayList<GasStation> stationList = new ArrayList<GasStation>();
+        if (jsonArray == null) {
+            final String REQUEST_URL = API_URL + "/stations/radius/"
+                    + latitude + "/" + longitude + "/" + distance + "/" + fuelType + "/"
+                    + sortBy + "/" + API_KEY + ".json";
 
-        final String REQUEST_URL = API_URL + "/stations/radius/"
-            + latitude + "/" + longitude + "/" + distance + "/" + fuelType + "/"
-            + sortBy + "/" + API_KEY + ".json";
-
-        Log.d("JSON_url", REQUEST_URL);
-        GetJson jsonAPI = new GetJson(REQUEST_URL);
-        Log.w("JSON_out", jsonAPI.getJSONString());
-        JSONArray jsonArray = jsonAPI.parseJSONObject().getJSONArray("stations");
-        
+            Log.d("JSON_url", REQUEST_URL);
+            GetJson jsonAPI = new GetJson(REQUEST_URL);
+            Log.w("JSON_out", jsonAPI.getJSONString());
+            jsonArray = jsonAPI.parseJSONObject().getJSONArray("stations");
+        }
 
         // TODO: add more data, such as last time updated to GasStation objects
+        ArrayList<GasStation> stationList = new ArrayList<>();
         for (int i = 0; i < jsonArray.length(); i++) {
             GasStation newStation = new GasStation();
             JSONObject stationJSON = jsonArray.getJSONObject(i);
@@ -86,11 +101,11 @@ public class MyGasFeedAPI {
     }
 
     /**
-     * @param price A string containing the price
+     * @param price A string containing the price, without a dollar sign.
      * @return true if the price is in the format X.XX. The API will
      *         return a non-double value if it has no data for a station's price
      */
-    private boolean validGasPrice(String price) {
+    public boolean validGasPrice(String price) {
         return price.matches("^[0-9](\\.[0-9]{2})$");
     }
 }
