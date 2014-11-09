@@ -3,7 +3,6 @@ package edu.csuchico.cheapgasfinder;
 import android.app.Activity;
 import android.content.Intent;
 import android.os.Bundle;
-import android.os.StrictMode;
 import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
@@ -44,13 +43,6 @@ public class newCarActivity extends Activity implements AdapterView.OnItemSelect
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_new_car);
-
-        /*
-         Allow networking to run in the main thread. This needs to be changed so networking
-         runs in its own thread, or the UI will lock up while waiting on the network
-        */
-        StrictMode.ThreadPolicy policy = new StrictMode.ThreadPolicy.Builder().permitAll().build();
-        StrictMode.setThreadPolicy(policy);
 
         // Set up variables for accessing the elements of the view
         nameTextView = (TextView) findViewById(R.id.nickname_text);
@@ -134,13 +126,29 @@ public class newCarActivity extends Activity implements AdapterView.OnItemSelect
      * @throws JSONException
      * @throws URISyntaxException
      */
-    public void populateYearSpinner()
-            throws IOException, JSONException, URISyntaxException {
-        ArrayList<String> yearList = carQuery.getYears();
-        ArrayAdapter<String> dataAdapter = new ArrayAdapter<String>(this,
-                android.R.layout.simple_spinner_item, yearList);
-        dataAdapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
-        yearSpinner.setAdapter(dataAdapter);
+    public void populateYearSpinner() throws IOException, JSONException, URISyntaxException {
+        new Thread(new Runnable() {
+            @Override
+            public void run() {
+                ArrayList<String> yearList = null;
+                try {
+                    yearList = carQuery.getYears();
+                } catch (Exception e) {
+                    e.printStackTrace();
+                }
+
+                final ArrayList<String> finalYearList = yearList;
+                yearSpinner.post(new Runnable() {
+                    @Override
+                    public void run() {
+                        ArrayAdapter<String> dataAdapter = new ArrayAdapter<String>(newCarActivity.this,
+                                android.R.layout.simple_spinner_item, finalYearList);
+                        dataAdapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
+                        yearSpinner.setAdapter(dataAdapter);
+                    }
+                });
+            }
+        }).start();
     }
 
     /**
@@ -151,13 +159,31 @@ public class newCarActivity extends Activity implements AdapterView.OnItemSelect
      * @throws URISyntaxException
      * @throws JSONException
      */
-    public void populateMakeSpinner(int year)
+    public void populateMakeSpinner(final int year)
             throws IOException, URISyntaxException, JSONException {
-        ArrayList<String> makeList = carQuery.getMakes(year);
-        ArrayAdapter<String> dataAdapter = new ArrayAdapter<String>(this,
-                android.R.layout.simple_spinner_item, makeList);
-        dataAdapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
-        makeSpinner.setAdapter(dataAdapter);
+
+        new Thread(new Runnable() {
+            @Override
+            public void run() {
+                ArrayList<String> makeList = null;
+                try {
+                    makeList = carQuery.getMakes(year);
+                } catch (Exception e) {
+                    e.printStackTrace();
+                }
+
+                final ArrayList<String> finalMakeList = makeList;
+                makeSpinner.post(new Runnable() {
+                     @Override
+                     public void run() {
+                         ArrayAdapter<String> dataAdapter = new ArrayAdapter<String>(newCarActivity.this,
+                                 android.R.layout.simple_spinner_item, finalMakeList);
+                         dataAdapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
+                         makeSpinner.setAdapter(dataAdapter);
+                     }
+                });
+            }
+        }).start();
     }
 
     /**
@@ -169,13 +195,31 @@ public class newCarActivity extends Activity implements AdapterView.OnItemSelect
      * @throws URISyntaxException
      * @throws JSONException
      */
-    public void populateModelSpinner(String make, int year)
+    public void populateModelSpinner(final String make, final int year)
             throws IOException, URISyntaxException, JSONException {
-        ArrayList<String> modelList = carQuery.getModels(make, year);
-        ArrayAdapter<String> dataAdapter = new ArrayAdapter<String>(this,
-                android.R.layout.simple_spinner_item, modelList);
-        dataAdapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
-        modelSpinner.setAdapter(dataAdapter);
+
+        new Thread(new Runnable() {
+            @Override
+            public void run() {
+                ArrayList<String> modelList = null;
+                try {
+                    modelList = carQuery.getModels(make, year);
+                } catch (Exception e) {
+                    e.printStackTrace();
+                }
+
+                final ArrayList<String> finalModelList = modelList;
+                makeSpinner.post(new Runnable() {
+                    @Override
+                    public void run() {
+                        ArrayAdapter<String> dataAdapter = new ArrayAdapter<String>(newCarActivity.this,
+                                android.R.layout.simple_spinner_item, finalModelList);
+                        dataAdapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
+                        modelSpinner.setAdapter(dataAdapter);
+                    }
+                });
+            }
+        }).start();
     }
 
     /**
@@ -188,13 +232,29 @@ public class newCarActivity extends Activity implements AdapterView.OnItemSelect
      * @throws URISyntaxException
      * @throws JSONException
      */
-    private void populateTrimSpinner(String model, String make, int year)
+    private void populateTrimSpinner(final String model, final String make, final int year)
             throws IOException, URISyntaxException, JSONException {
-        trimMap = carQuery.getTrims(model, make, year);
-        ArrayAdapter<String> dataAdapter = new ArrayAdapter<String>(this,
-                android.R.layout.simple_spinner_item, new ArrayList<String>(trimMap.keySet()));
-        dataAdapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
-        trimSpinner.setAdapter(dataAdapter);
+
+        new Thread(new Runnable() {
+            @Override
+            public void run() {
+                try {
+                    trimMap = carQuery.getTrims(model, make, year);
+                } catch (Exception e) {
+                    e.printStackTrace();
+                }
+
+                makeSpinner.post(new Runnable() {
+                    @Override
+                    public void run() {
+                        ArrayAdapter<String> dataAdapter = new ArrayAdapter<String>(newCarActivity.this,
+                                android.R.layout.simple_spinner_item, new ArrayList<String>(trimMap.keySet()));
+                        dataAdapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
+                        trimSpinner.setAdapter(dataAdapter);
+                    }
+                });
+            }
+        }).start();
     }
 
     /**
@@ -206,15 +266,33 @@ public class newCarActivity extends Activity implements AdapterView.OnItemSelect
      * @throws URISyntaxException
      * @throws JSONException
      */
-    public void updateCarInfo(int modelID) throws IOException, URISyntaxException, JSONException {
-        Map<String, String> carInfo = carQuery.getCarInfo(modelID);
-        newCar.setTankSize(Double.parseDouble(carInfo.get("mpg")));
-        newCar.setMpg(Double.parseDouble(carInfo.get("tankSize")));
-        newCar.setFuelType(carInfo.get("fuelType"));
-        TextView textView = (TextView) findViewById(R.id.car_info);
-        textView.setText("MPG: " + newCar.getMpg()
-                + "\nTank Size: " + newCar.getTankSize()
-                + "\nFuel type: " + newCar.getFuelType());
+    public void updateCarInfo(final int modelID)
+            throws IOException, URISyntaxException, JSONException {
+
+        new Thread(new Runnable() {
+            @Override
+            public void run() {
+                Map<String, String> carInfo;
+                try {
+                    carInfo = carQuery.getCarInfo(modelID);
+                    newCar.setTankSize(Double.parseDouble(carInfo.get("mpg")));
+                    newCar.setMpg(Double.parseDouble(carInfo.get("tankSize")));
+                    newCar.setFuelType(carInfo.get("fuelType"));
+                } catch (Exception e) {
+                    e.printStackTrace();
+                }
+
+                makeSpinner.post(new Runnable() {
+                    @Override
+                    public void run() {
+                        TextView textView = (TextView) findViewById(R.id.car_info);
+                        textView.setText("MPG: " + newCar.getMpg()
+                                + "\nTank Size: " + newCar.getTankSize()
+                                + "\nFuel type: " + newCar.getFuelType());
+                    }
+                });
+            }
+        }).start();
     }
 
     /**

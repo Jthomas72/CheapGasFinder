@@ -1,6 +1,5 @@
 package edu.csuchico.cheapgasfinder;
 
-import android.util.Log;
 import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
@@ -18,11 +17,13 @@ import java.util.Map;
  */
 public class CarQueryAPI {
 
-    final static private String GET_YEARS_URL      = "http://www.carqueryapi.com/api/0.3/?callback=?&cmd=getYears";
-    final static private String GET_MAKES_URL      = "http://www.carqueryapi.com/api/0.3/?callback=?&cmd=getMakes&sold_in_us=1";
-    final static private String GET_MODELS_URL     = "http://www.carqueryapi.com/api/0.3/?callback=?&cmd=getModels&sold_in_us=1";
-    final static private String GET_TRIMS_URL      = "http://www.carqueryapi.com/api/0.3/?callback=?&cmd=getTrims";
-    final static private String GET_MODEL_DATA_URL = "http://www.carqueryapi.com/api/0.3/?callback=?&cmd=getModel";
+    final static private String BASE_URL           = "http://www.carqueryapi.com/api/0.3/";
+
+    final static private String GET_YEARS_URL      = BASE_URL + "?callback=?&cmd=getYears";
+    final static private String GET_MAKES_URL      = BASE_URL + "?callback=?&cmd=getMakes&sold_in_us=1";
+    final static private String GET_MODELS_URL     = BASE_URL + "?callback=?&cmd=getModels&sold_in_us=1";
+    final static private String GET_TRIMS_URL      = BASE_URL + "?callback=?&cmd=getTrims";
+    final static private String GET_MODEL_DATA_URL = BASE_URL + "?callback=?&cmd=getModel";
 
     /**
      * @return ArrayList containing all possible years of cars
@@ -30,15 +31,11 @@ public class CarQueryAPI {
      * @throws JSONException
      */
     public ArrayList<String> getYears() throws IOException, JSONException {
-        ArrayList<String> yearList = new ArrayList<String>();
-        String jsonURL = GET_YEARS_URL;
-        Log.d("JSON_URL", jsonURL);
-        GetJson jsonAPI = new GetJson(jsonURL);
-        Log.w("JSON_out", jsonAPI.getJSONString());
-
+        GetJson jsonAPI = new GetJson(GET_YEARS_URL);
         int min_year = jsonAPI.parseJSONObject().getJSONObject("Years").getInt("min_year");
         int max_year = jsonAPI.parseJSONObject().getJSONObject("Years").getInt("max_year");
 
+        ArrayList<String> yearList = new ArrayList<String>();
         for (int i = max_year; i >= min_year; i--) {
             yearList.add(Integer.toString(i));
         }
@@ -53,13 +50,10 @@ public class CarQueryAPI {
      * @throws IOException
      */
     public ArrayList<String> getMakes(int year) throws JSONException, IOException {
-        ArrayList<String> makeList = new ArrayList<String>();
-        String jsonURL = GET_MAKES_URL + "&year=" + Integer.toString(year);
-        Log.d("JSON_URL", jsonURL);
-        GetJson jsonAPI = new GetJson(jsonURL);
-        Log.w("JSON_out", jsonAPI.getJSONString());
+        GetJson jsonAPI = new GetJson(GET_MAKES_URL + "&year=" + Integer.toString(year));
         JSONArray makesArray = jsonAPI.parseJSONObject().getJSONArray("Makes");
 
+        ArrayList<String> makeList = new ArrayList<String>();
         for (int i = 0; i < makesArray.length(); i++) {
             makeList.add(makesArray.getJSONObject(i).getString("make_display"));
         }
@@ -75,13 +69,10 @@ public class CarQueryAPI {
      * @throws JSONException
      */
     public ArrayList<String> getModels(String make, int year) throws IOException, JSONException {
-        ArrayList<String> modelList = new ArrayList<String>();
-        String jsonURL = GET_MODELS_URL + "&year=" + Integer.toString(year) + "&make=" + make;
-        Log.d("JSON_URL", jsonURL);
-        GetJson jsonAPI = new GetJson(jsonURL);
-        Log.d("JSON_out", jsonAPI.getJSONString());
+        GetJson jsonAPI = new GetJson(GET_MODELS_URL + "&year=" + Integer.toString(year) + "&make=" + make);
         JSONArray modelsArray = jsonAPI.parseJSONObject().getJSONArray("Models");
 
+        ArrayList<String> modelList = new ArrayList<String>();
         for (int i = 0; i < modelsArray.length(); i++) {
             modelList.add(modelsArray.getJSONObject(i).getString("model_name"));
         }
@@ -98,13 +89,10 @@ public class CarQueryAPI {
      * @throws IOException
      */
     public Map<String,Integer> getTrims(String model, String make, int year) throws JSONException, IOException {
-        Map<String, Integer> trimMap = new HashMap<String, Integer>();
-        String jsonURL = GET_TRIMS_URL + "&year=" + Integer.toString(year) + "&make=" + make + "&model=" + model;
-        GetJson jsonAPI = new GetJson(jsonURL);
-        Log.d("JSON_URL", jsonURL);
-        Log.d("JSON_out", jsonAPI.getJSONString());
+        GetJson jsonAPI = new GetJson(GET_TRIMS_URL + "&year=" + Integer.toString(year) + "&make=" + make + "&model=" + model);
         JSONArray trimsArray = jsonAPI.parseJSONObject().getJSONArray("Trims");
 
+        Map<String, Integer> trimMap = new HashMap<String, Integer>();
         for (int i = 0; i < trimsArray.length(); i++ ) {
             String trimName = trimsArray.getJSONObject(i).getString("model_trim");
             if (trimName.isEmpty()) trimName = "None";
@@ -125,13 +113,10 @@ public class CarQueryAPI {
      * @throws JSONException
      */
     public Map<String, String> getCarInfo(int modelID) throws IOException, JSONException {
-        Map<String, String> infoHash = new HashMap<String, String>();
-        String jsonURL = GET_MODEL_DATA_URL + "&model=" + modelID;
-        Log.d("JSON_URL", jsonURL);
-        GetJson carQueryAPI = new GetJson(jsonURL);
-        Log.d("JSON_out", carQueryAPI.getJSONString());
-
+        GetJson carQueryAPI = new GetJson(GET_MODEL_DATA_URL + "&model=" + modelID);
         JSONObject carInfo = carQueryAPI.parseJSONArray().getJSONObject(0);
+
+        Map<String, String> infoHash = new HashMap<String, String>();
         infoHash.put("mpg", carInfo.getString("model_mpg_city"));
         infoHash.put("tankSize", carInfo.getString("model_fuel_cap_g"));
 
@@ -146,7 +131,6 @@ public class CarQueryAPI {
             fuelType = "Diesel";
         else if (BuildConfig.DEBUG)
             throw new RuntimeException("Unknown fuel type");
-
 
         infoHash.put("fuelType", fuelType);
 

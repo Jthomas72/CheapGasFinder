@@ -3,9 +3,7 @@ package edu.csuchico.cheapgasfinder;
 import android.location.Location;
 
 import junit.framework.TestCase;
-/**
- * Created by Mason on 11/2/2014.
- */
+
 public class GasStationTest extends TestCase{
 
     Location origin, destination;
@@ -34,7 +32,7 @@ public class GasStationTest extends TestCase{
     }
 
     public void testSetDistanceLessThan5() {
-        assertTrue("Distance is most likely returning too large of a value", gasStation.getDistance() < 3);
+        assertTrue("Distance is returning too large of a value", gasStation.getDistance() < 2);
     }
 
 }
