@@ -3,14 +3,14 @@ package edu.csuchico.cheapgasfinder;
 /**
  * Given a Station and a Car, calculates the cost of getting gas.
  */
-public class GasPrice {
+public class TotalGasPrice {
     private Car car;
 
     private double gallonsUsed;
     private double fuelPrice;
 
     /**
-     * Sets up a new GasPrice. Calculates gallons used to get to the station, and sets the type
+     * Sets up a new TotalGasPrice. Calculates gallons used to get to the station, and sets the type
      * of fuel based on the car.
      *
      * @param station The gas station to calculate results for.
@@ -18,7 +18,7 @@ public class GasPrice {
      * @param returnTrip True if the user will be returning to the starting point.
      */
 
-    public GasPrice(GasStation station, Car car, boolean returnTrip) {
+    public TotalGasPrice(GasStation station, Car car, boolean returnTrip) {
         this.car = car;
 
         gallonsUsed = station.getDistance() / car.getMpg(); // miles * (gallons / miles) = gallons

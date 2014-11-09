@@ -85,8 +85,10 @@ public class selectDestinationActivity extends Activity implements
             double longitude = station.getLongitude();
             String name = station.getName();
 
-            GasPrice gasPrice = new GasPrice(station, car, true);
-            double totalPrice = gasPrice.getTotalPrice(car.getTankSize());
+            /* TODO: use the other constructor based upon a starting and ending location,
+             after the search box is added */
+            TotalGasPrice totalGasPrice = new TotalGasPrice(station, car, true);
+            double totalPrice = totalGasPrice.getTotalPrice(car.getTankSize());
 
             String markerText;
             if (totalPrice != 0)
