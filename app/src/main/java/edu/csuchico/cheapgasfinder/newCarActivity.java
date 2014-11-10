@@ -11,6 +11,8 @@ import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
 import android.widget.Spinner;
 import android.widget.TextView;
+import android.widget.Toast;
+
 import org.json.JSONException;
 import java.io.IOException;
 import java.net.URISyntaxException;
@@ -302,10 +304,16 @@ public class newCarActivity extends Activity implements AdapterView.OnItemSelect
      */
     public void saveCar(View view) {
         String name = nameTextView.getText().toString();
-        newCar.setName(name);
-        cars.save(newCar);
-        Intent intent = new Intent(newCarActivity.this, selectCarActivity.class);
-        startActivity(intent);
+
+        if (!name.isEmpty()) {
+            newCar.setName(name);
+            cars.save(newCar);
+            Intent intent = new Intent(newCarActivity.this, selectCarActivity.class);
+            startActivity(intent);
+        } else {
+            CharSequence text = "A nickname is required.";
+            Toast.makeText(getApplicationContext(), text, Toast.LENGTH_SHORT).show();
+        }
     }
 
     @Override

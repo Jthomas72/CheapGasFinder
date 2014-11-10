@@ -66,6 +66,7 @@ public class MyGasFeedAPI {
         }
 
         // TODO: add more data, such as last time updated to GasStation objects
+        //noinspection Convert2Diamond Changing this will break the build.
         ArrayList<GasStation> stationList = new ArrayList<GasStation>();
         for (int i = 0; i < jsonArray.length(); i++) {
             GasStation newStation = new GasStation();
