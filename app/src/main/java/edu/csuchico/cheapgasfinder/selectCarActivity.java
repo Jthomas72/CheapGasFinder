@@ -1,12 +1,15 @@
 package edu.csuchico.cheapgasfinder;
 
+import android.app.AlertDialog;
 import android.app.ListActivity;
+import android.content.DialogInterface;
 import android.content.Intent;
 import android.os.Bundle;
 import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
+import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
 import android.widget.ListView;
 
@@ -17,6 +20,7 @@ import android.widget.ListView;
 public class selectCarActivity extends ListActivity {
     Cars cars;
     ListView carsListView;
+    ArrayAdapter<String> arrayAdapter;
 
     /**
      * Sets up the the elements of the select car view
@@ -28,7 +32,30 @@ public class selectCarActivity extends ListActivity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_select_car);
+
+        carsListView = (ListView) findViewById(android.R.id.list);
         cars = new Cars(this);
+
+        // Listens for long clicks on a list item and deletes that item after confirmation
+        this.getListView().setLongClickable(true);
+        this.getListView().setOnItemLongClickListener(new AdapterView.OnItemLongClickListener() {
+            public boolean onItemLongClick(final AdapterView<?> parent, final View v, final int position, long id) {
+                new AlertDialog.Builder(selectCarActivity.this)
+                        .setMessage("Are you sure you want to delete this car?")
+                        .setCancelable(false)
+                        .setPositiveButton("Yes", new DialogInterface.OnClickListener() {
+                            public void onClick(DialogInterface dialog, int id) {
+                                String name = (String) parent.getItemAtPosition(position);
+                                Log.d("clicked delete on ", name);
+                                cars.delete(name);
+                                loadCarsList();
+                            }
+                        })
+                        .setNegativeButton("No", null)
+                        .show();
+                return true;
+            }
+        });
     }
 
     /**
@@ -38,16 +65,16 @@ public class selectCarActivity extends ListActivity {
     @Override
     public void onResume() {
         super.onResume();
+        loadCarsList();
+    }
 
-        carsListView = (ListView) findViewById(android.R.id.list);
-        cars = new Cars(this);
-
-        // only attempt to load cars if the list is non-empty
-        if (!cars.getCarsNames().isEmpty()) {
-            ArrayAdapter<String> arrayAdapter
-                    = new ArrayAdapter<String>(this, android.R.layout.simple_list_item_1, cars.getCarsNames());
-            carsListView.setAdapter(arrayAdapter);
-        }
+    /**
+     * Updates the list view with the stored Car objects
+     *
+     */
+    private void loadCarsList() {
+        arrayAdapter = new ArrayAdapter<String>(this, android.R.layout.simple_list_item_1, cars.getCarsNames());
+        carsListView.setAdapter(arrayAdapter);
     }
 
     /**
@@ -90,9 +117,6 @@ public class selectCarActivity extends ListActivity {
         // automatically handle clicks on the Home/Up button, so long
         // as you specify a parent activity in AndroidManifest.xml.
         int id = item.getItemId();
-        if (id == R.id.action_settings) {
-            return true;
-        }
-        return super.onOptionsItemSelected(item);
+        return id == R.id.action_settings || super.onOptionsItemSelected(item);
     }
 }
