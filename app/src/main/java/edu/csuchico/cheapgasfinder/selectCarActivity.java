@@ -61,7 +61,7 @@ public class selectCarActivity extends ListActivity {
     @Override
     protected void onListItemClick(ListView l, View v, int position, long id) {
         Log.d("Car_selected", cars.getCars().get(position).getName());
-        Intent intent = new Intent(selectCarActivity.this, selectDestinationActivity.class);
+        Intent intent = new Intent(selectCarActivity.this, CreateRouteActivity.class);
         intent.putExtra("car_json", cars.getCarsJSON().get(position));
         startActivity(intent);
     }
@@ -90,9 +90,6 @@ public class selectCarActivity extends ListActivity {
         // automatically handle clicks on the Home/Up button, so long
         // as you specify a parent activity in AndroidManifest.xml.
         int id = item.getItemId();
-        if (id == R.id.action_settings) {
-            return true;
-        }
-        return super.onOptionsItemSelected(item);
+        return id == R.id.action_settings || super.onOptionsItemSelected(item);
     }
 }

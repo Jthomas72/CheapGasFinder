@@ -25,10 +25,6 @@
             android:name=".newCarActivity"
             android:label="@string/title_activity_new_car" >
         </activity>
-        <activity
-            android:name=".selectDestinationActivity"
-            android:label="@string/title_activity_select_destination" >
-        </activity>
 
         <meta-data
             android:name="com.google.android.gms.version"
@@ -39,11 +35,16 @@
 
         <activity
             android:name=".SplashActivity"
-            android:label="@string/title_activity_splash" >
+            android:label="@string/app_name" >
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
+
                 <category android:name="android.intent.category.LAUNCHER" />
             </intent-filter>
+        </activity>
+        <activity
+            android:name=".CreateRouteActivity"
+            android:label="@string/title_activity_create_route" >
         </activity>
     </application>
 

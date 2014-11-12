@@ -1,0 +1,20 @@
+<FrameLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    tools:context="edu.csuchico.cheapgasfinder.SearchFragment">
+
+
+    <SearchView
+        android:layout_width="366dp"
+        android:layout_height="103dp"
+        android:id="@+id/searchView"
+        android:layout_gravity="center_horizontal|top" />
+
+    <ListView
+        android:id="@android:id/list"
+        android:layout_width="match_parent"
+        android:layout_height="384dp"
+        android:layout_gravity="center_horizontal|bottom" />
+
+</FrameLayout>

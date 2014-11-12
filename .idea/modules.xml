@@ -4,6 +4,7 @@
     <modules>
       <module fileurl="file://$PROJECT_DIR$/CheapGasFinder.iml" filepath="$PROJECT_DIR$/CheapGasFinder.iml" />
       <module fileurl="file://$PROJECT_DIR$/app/app.iml" filepath="$PROJECT_DIR$/app/app.iml" />
+      <module fileurl="file://$PROJECT_DIR$/google-places-api-java/google-places-api-java.iml" filepath="$PROJECT_DIR$/google-places-api-java/google-places-api-java.iml" />
     </modules>
   </component>
 </project>

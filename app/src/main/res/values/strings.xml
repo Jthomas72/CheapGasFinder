@@ -9,5 +9,13 @@
     <string name="title_activity_select_destination">Select Destination</string>
     <string name="title_activity_splash">Splash Screen</string>
     <string name="nickname_text_value">Nickname</string>
+    <string name="search_hint">Search Places</string>
+    <string name="search_settings">Search Places</string>
+    <string name="action_search">Search</string>
+    <string name="title_activity_create_route">CreateRouteActivity</string>
+    <string name="title_section1">Section 1</string>
+    <string name="title_section2">Section 2</string>
+    <string name="hello_blank_fragment">Hello blank fragment</string>
+
 
 </resources>
