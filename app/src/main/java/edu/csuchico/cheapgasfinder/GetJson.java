@@ -1,5 +1,7 @@
 package edu.csuchico.cheapgasfinder;
 
+import android.util.Log;
+
 import org.apache.http.HttpResponse;
 import org.apache.http.client.HttpClient;
 import org.apache.http.client.methods.HttpGet;
@@ -28,10 +30,13 @@ public class GetJson {
      * @throws IOException
      */
     public GetJson(String url) throws IOException {
+        Log.d("JSON_URL", url);
+
         HttpClient httpClient = new DefaultHttpClient();
         HttpGet httpGet = new HttpGet(url);
         HttpResponse httpResponse = httpClient.execute(httpGet);
         this.jsonstring = EntityUtils.toString(httpResponse.getEntity());
+        Log.w("JSON_out", jsonstring);
     }
 
     public String getJSONString() {

@@ -1,11 +1,13 @@
 package edu.csuchico.cheapgasfinder;
 
+import android.location.Location;
+import android.util.Log;
+
 /**
  * Stores the fields for a gas station object.
  * The information will come from MyGasFeedAPI.
  */
 public class GasStation {
-    int id;
     private double regPrice, midPrice, prePrice, dieselPrice,
             distance, latitude, longitude;
     private String address, region, city, name;
@@ -116,5 +118,30 @@ public class GasStation {
 
         // distance[0] should contain a double
         return Double.parseDouble(distance[0]);
+    }
+
+    /**
+     * Sets the distance based upon how many extra miles it will take to drive to
+     * the gas station on the way to your destination, instead of directly to the
+     * destination.
+     *
+     * @param origin The starting location.
+     * @param destination The ending location.
+     */
+    public void setDistance(Location origin, Location destination) {
+        Float toDestinationMeters = origin.distanceTo(destination);
+        Log.w("GasStation toDestinationMeters", toDestinationMeters.toString());
+
+        // the value of the constructor param doesn't matter since the lat/long values are set from known values
+        Location stationLocation = new Location("MyGasFeed");
+
+        stationLocation.setLatitude(this.latitude);
+        stationLocation.setLongitude(this.longitude);
+        Float toGasStationMeters = origin.distanceTo(stationLocation) + stationLocation.distanceTo(destination);
+        Log.w("GasStation toGasStationMeters", toGasStationMeters.toString());
+
+        // converts meters into miles
+        this.distance = (toGasStationMeters - toDestinationMeters) / 1609.34;
+        Log.w("GasStation distance", Double.toString(this.distance));
     }
 }

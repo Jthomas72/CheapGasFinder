@@ -8,6 +8,7 @@ import com.google.gson.Gson;
 
 import java.util.ArrayList;
 import java.util.HashSet;
+import java.util.Iterator;
 import java.util.Set;
 
 /**
@@ -47,6 +48,28 @@ public class Cars {
 
         editor.putStringSet("cars", cars);
         editor.apply(); // apply() writes to preferences asynchronously, and commit() doesn't
+    }
+
+    public void save(ArrayList<Car> carsList) {
+        Set<String> cars = context.getSharedPreferences(PREFS_NAME, 0).getStringSet("cars", null);
+        cars.clear();
+
+        for (Car car : carsList) {
+            this.save(car);
+        }
+    }
+
+    public void delete(String name) {
+        ArrayList<Car> carsList = getCars();
+
+        for (Iterator<Car> it = carsList.iterator(); it.hasNext(); ) {
+            Car car = it.next();
+            if (car.getName().equals(name)) {
+                it.remove();
+            }
+        }
+
+        this.save(carsList);
     }
 
     /**

@@ -7,7 +7,6 @@
     <string name="title_activity_select_car">Select Car</string>
     <string name="title_activity_new_car">Add New Car</string>
     <string name="title_activity_select_destination">Select Destination</string>
-    <string name="title_activity_splash">Splash Screen</string>
     <string name="nickname_text_value">Nickname</string>
     <string name="search_hint">Search Places</string>
     <string name="search_settings">Search Places</string>
