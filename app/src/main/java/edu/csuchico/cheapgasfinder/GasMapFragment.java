@@ -122,7 +122,7 @@ public class GasMapFragment extends Fragment implements
                 = myGasFeed.getStations(currentLocation.getLatitude(), currentLocation.getLongitude(),
                 50, "reg", "distance");
 
-        ArrayList <GasPrice> gasPrices = new ArrayList<GasPrice>();
+        ArrayList <TotalGasPrice> gasPrices = new ArrayList<TotalGasPrice>();
 
         // For each station in stations
         for (GasStation station : stations) {
@@ -130,7 +130,7 @@ public class GasMapFragment extends Fragment implements
             double longitude = station.getLongitude();
             String name = station.getName();
 
-            GasPrice gasPrice = new GasPrice(station, car, true);
+            TotalGasPrice gasPrice = new TotalGasPrice(station, car, true);
             double totalPrice = gasPrice.getTotalPrice(car.getTankSize());
             gasPrices.add(gasPrice);
 
