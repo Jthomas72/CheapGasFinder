@@ -1,6 +1,9 @@
 package edu.csuchico.cheapgasfinder;
 
 import android.app.Activity;
+import android.location.GpsStatus;
+import android.location.Location;
+import android.location.LocationManager;
 import android.os.Bundle;
 import android.view.Menu;
 import android.view.MenuItem;
@@ -8,6 +11,8 @@ import android.util.Log;
 import android.content.Intent;
 import android.view.Window;
 import android.view.WindowManager;
+
+import com.google.android.gms.location.LocationClient;
 
 
 public class SplashActivity extends Activity {
@@ -24,6 +29,7 @@ public class SplashActivity extends Activity {
         setContentView(R.layout.activity_splash);
 
         // Start timer and launch main activity
+
         IntentLauncher launcher = new IntentLauncher();
         launcher.start();
     }
@@ -35,7 +41,10 @@ public class SplashActivity extends Activity {
         {
             try
             {
-                Thread.sleep(SLEEP_TIME*1000);
+                //Thread.sleep(SLEEP_TIME*1000);
+                //LocationClient mLocationClient;
+                //Location mCurrentLocation;
+                //mCurrentLocation = mLocationClient.getLastLocation();
             }
             catch (Exception e)
             {
