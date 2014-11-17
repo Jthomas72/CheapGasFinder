@@ -11,6 +11,7 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ArrayAdapter;
 import android.widget.ListView;
+import android.widget.SearchView;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -31,8 +32,8 @@ import se.walkercrou.places.Place;
 public class SearchFragment extends ListFragment {
 
     ListView placesListView;
-    List<Place> places;
-    ArrayList<String> placeNames;
+    List<se.walkercrou.places.Prediction> predictions;
+    ArrayList<String> predictionNames;
     View view;
 
     private OnFragmentInteractionListener mListener;
@@ -47,18 +48,6 @@ public class SearchFragment extends ListFragment {
     @Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-
-        StrictMode.ThreadPolicy policy = new StrictMode.ThreadPolicy.Builder().permitAll().build();
-        StrictMode.setThreadPolicy(policy);
-
-        GooglePlaces client = new GooglePlaces("AIzaSyDi6lDOivgNS6g2zvaXJr6UqJoIvNXHDgA");
-        places = client.getPlacesByQuery("Chevron", GooglePlaces.MAXIMUM_RESULTS);
-
-        placeNames = new ArrayList<String>();
-
-        for (Place place: places) {
-            placeNames.add(place.getName());
-        }
     }
 
     @Override
@@ -66,6 +55,57 @@ public class SearchFragment extends ListFragment {
                              Bundle savedInstanceState) {
         // Inflate the layout for this fragment
         view = inflater.inflate(R.layout.fragment_search, container, false);
+
+        StrictMode.ThreadPolicy policy = new StrictMode.ThreadPolicy.Builder().permitAll().build();
+        StrictMode.setThreadPolicy(policy);
+
+        final GooglePlaces client = new GooglePlaces("AIzaSyDi6lDOivgNS6g2zvaXJr6UqJoIvNXHDgA");
+
+        SearchView user_search = (SearchView) view.findViewById(R.id.searchView);
+
+        user_search.setOnQueryTextListener(new SearchView.OnQueryTextListener() {
+
+            @Override
+            public boolean onQueryTextSubmit(String s) {
+                return true;
+            }
+
+            @Override
+            public boolean onQueryTextChange(String s) {
+                if (!s.equals("")) {
+                    predictions = client.getPlacePredictions(s);
+
+                    predictionNames = new ArrayList<String>();
+
+                    for (se.walkercrou.places.Prediction prediction : predictions) {
+                        predictionNames.add(prediction.toString());
+                    }
+
+                    placesListView = getListView();
+
+                    ArrayAdapter<String> arrayAdapter
+                            = new ArrayAdapter<String>(getActivity(), android.R.layout.simple_list_item_1, predictionNames);
+                    placesListView.setAdapter(arrayAdapter);
+                }
+                return true;
+            }
+        });
+
+        //places = client.getPlacesByQuery("Chevron", GooglePlaces.MAXIMUM_RESULTS);
+
+        //placeNames = new ArrayList<String>();
+
+        /*
+        predictionNames = new ArrayList<String>();
+
+        for (se.walkercrou.places.Prediction prediction: predictions) {
+            predictionNames.add(prediction.toString());
+        }
+
+        for (Place place: places) {
+            placeNames.add(place.getName());
+        }
+        */
 
         return view;
     }
@@ -98,11 +138,13 @@ public class SearchFragment extends ListFragment {
     public void onResume() {
         super.onResume();
 
+        /*
         placesListView = getListView();
 
         ArrayAdapter<String> arrayAdapter
-                = new ArrayAdapter<String>(getActivity(), android.R.layout.simple_list_item_1, placeNames);
+                = new ArrayAdapter<String>(getActivity(), android.R.layout.simple_list_item_1, predictionNames);
         placesListView.setAdapter(arrayAdapter);
+        */
     }
 
     /**
